@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Exercises{% endblock %}
+{% block page_title %}Practice Exercises{% endblock %}
+{% block content %}
+<div class="row g-4">
+{% for ex in exercises %}
+<div class="col-lg-4 col-md-6">
+    <div class="card h-100">
+        <div class="card-body">
+            <span class="badge bg-light text-dark border mb-2">{{ ex.get_exercise_type_display }}</span>
+            <h6 class="fw-bold">{{ ex.title }}</h6>
+            <p class="text-muted small">{{ ex.content|truncatechars:100 }}</p>
+            <div class="d-flex gap-1">
+                {% for i in "12345" %}
+                <i class="fas fa-star {% if forloop.counter <= ex.difficulty %}text-warning{% else %}text-secondary opacity-25{% endif %}" style="font-size:0.7rem;"></i>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="card-footer bg-transparent">
+            <a href="{% url 'learning:exercise' ex.pk %}" class="btn btn-sm btn-primary w-100">Start Exercise</a>
+        </div>
+    </div>
+</div>
+{% empty %}<div class="col-12"><div class="card p-5 text-center text-muted"><i class="fas fa-pen fa-3x mb-3 opacity-25"></i><p>No exercises yet.</p></div></div>
+{% endfor %}
+</div>
+{% endblock %}

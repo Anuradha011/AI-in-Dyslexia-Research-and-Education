@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Link Child{% endblock %}
+{% block page_title %}Link Child Account{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-lg-6">
+    <div class="card">
+        <div class="card-header">
+            <i class="fas fa-link me-2" style="color:#6c63ff;"></i>Link a Student to Your Account
+        </div>
+        <div class="card-body p-4">
+            <div class="alert alert-info small mb-4">
+                <i class="fas fa-info-circle me-2"></i>
+                Search for your child's username and link their account to yours. You'll be able to monitor their progress, assessments, and reports.
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label class="form-label">Select Student</label>
+                    <select name="student_id" class="form-select" required>
+                        <option value="">-- Choose your child's account --</option>
+                        {% for s in students %}
+                        <option value="{{ s.pk }}">{{ s.get_full_name|default:s.username }} ({{ s.username }}) {% if s.institution %}— {{ s.institution }}{% endif %}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2">
+                    <i class="fas fa-link me-2"></i>Link This Child
+                </button>
+            </form>
+            <div class="text-center mt-3">
+                <a href="{% url 'accounts:parent_dashboard' %}" class="btn btn-outline-secondary">← Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

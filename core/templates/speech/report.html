@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+{% block title %}Speech Report{% endblock %}
+{% block page_title %}Speech Performance Report{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-lg-10">
+
+<!-- Header Grade Card -->
+<div class="card mb-4" style="background:linear-gradient(135deg,#6c63ff,#fd79a8);border:none;overflow:hidden;">
+    <div class="card-body p-4 text-white">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <div style="font-size:0.85rem;opacity:0.8;text-transform:uppercase;letter-spacing:2px;">Session Complete</div>
+                <h3 class="fw-bold mt-1 mb-1">Speech Analysis Report</h3>
+                <div style="opacity:0.85;">{{ session.student.get_full_name|default:session.student.username }} &nbsp;·&nbsp; {{ session.created_at|date:"F d, Y" }}</div>
+                <div class="mt-2 small opacity-75">
+                    <i class="fas fa-clock me-1"></i>
+                    Duration: {{ session.duration_seconds }}s
+                    &nbsp;·&nbsp;
+                    <i class="fas fa-font me-1"></i>
+                    {{ session.word_count }} words spoken
+                </div>
+            </div>
+            <div class="col-md-6 text-md-end text-center mt-3 mt-md-0">
+                <div style="display:inline-block;background:rgba(255,255,255,0.2);border-radius:24px;padding:24px 40px;backdrop-filter:blur(10px);">
+                    <div style="font-size:4rem;font-weight:900;line-height:1;">{{ session.get_grade }}</div>
+                    <div style="font-size:1rem;font-weight:600;opacity:0.85;">Overall Grade</div>
+                    <div style="font-size:1.8rem;font-weight:800;margin-top:4px;">{{ session.overall_score }}%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Score Cards Row -->
+<div class="row g-3 mb-4">
+    <!-- Fluency -->
+    <div class="col-md-3 col-6">
+        <div class="card h-100 text-center p-3">
+            <div style="width:56px;height:56px;background:linear-gradient(135deg,#6c63ff,#a29bfe);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
+                <i class="fas fa-water text-white" style="font-size:1.3rem;"></i>
+            </div>
+            <div style="font-size:2rem;font-weight:900;color:#6c63ff;">{{ session.fluency_score|floatformat:0 }}%</div>
+            <div class="text-muted small fw-bold">Fluency</div>
+            <div class="progress mt-2" style="height:6px;">
+                <div class="progress-bar" style="background:#6c63ff;width:{{ session.fluency_score }}%;"></div>
+            </div>
+        </div>
+    </div>
+    <!-- Pronunciation -->
+    <div class="col-md-3 col-6">
+        <div class="card h-100 text-center p-3">
+            <div style="width:56px;height:56px;background:linear-gradient(135deg,#00b894,#55efc4);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
+                <i class="fas fa-comment-dots text-white" style="font-size:1.3rem;"></i>
+            </div>
+            <div style="font-size:2rem;font-weight:900;color:#00b894;">{{ session.pronunciation_score|floatformat:0 }}%</div>
+            <div class="text-muted small fw-bold">Pronunciation</div>
+            <div class="progress mt-2" style="height:6px;">
+                <div class="progress-bar bg-success" style="width:{{ session.pronunciation_score }}%;"></div>
+            </div>
+        </div>
+    </div>
+    <!-- Accuracy -->
+    <div class="col-md-3 col-6">
+        <div class="card h-100 text-center p-3">
+            <div style="width:56px;height:56px;background:linear-gradient(135deg,#fd79a8,#e84393);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
+                <i class="fas fa-bullseye text-white" style="font-size:1.3rem;"></i>
+            </div>
+            <div style="font-size:2rem;font-weight:900;color:#e84393;">{{ session.accuracy_score|floatformat:0 }}%</div>
+            <div class="text-muted small fw-bold">Accuracy</div>
+            <div class="progress mt-2" style="height:6px;">
+                <div class="progress-bar" style="background:#e84393;width:{{ session.accuracy_score }}%;"></div>
+            </div>
+        </div>
+    </div>
+    <!-- Reading Speed -->
+    <div class="col-md-3 col-6">
+        <div class="card h-100 text-center p-3">
+            <div style="width:56px;height:56px;background:linear-gradient(135deg,#e17055,#fdcb6e);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
+                <i class="fas fa-tachometer-alt text-white" style="font-size:1.3rem;"></i>
+            </div>
+            <div style="font-size:2rem;font-weight:900;color:#e17055;">{{ session.reading_speed_wpm|floatformat:0 }}</div>
+            <div class="text-muted small fw-bold">Words/Min</div>
+            <div class="small text-muted mt-1">Ideal: 90–150 wpm</div>
+        </div>
+    </div>
+</div>
+
+<!-- Word Accuracy Detail -->
+<div class="card mb-4">
+    <div class="card-header fw-bold">
+        <i class="fas fa-spell-check me-2" style="color:#6c63ff;"></i>Word Accuracy Detail
+    </div>
+    <div class="card-body">
+        <div class="row g-4 text-center mb-4">
+            <div class="col-md-4">
+                <div style="background:#e0f7ef;border-radius:14px;padding:20px;">
+                    <div style="font-size:2.5rem;font-weight:900;color:#00b894;">{{ scores.words_correct }}</div>
+                    <div class="text-muted fw-bold">Words Correct</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div style="background:#fce8e8;border-radius:14px;padding:20px;">
+                    <div style="font-size:2.5rem;font-weight:900;color:#d63031;">{{ scores.error_count }}</div>
+                    <div class="text-muted fw-bold">Errors</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div style="background:#ede9ff;border-radius:14px;padding:20px;">
+                    <div style="font-size:2.5rem;font-weight:900;color:#6c63ff;">{{ scores.similarity_ratio }}%</div>
+                    <div class="text-muted fw-bold">Match Rate</div>
+                </div>
+            </div>
+        </div>
+
+        {% if scores.words_missed %}
+        <div class="mb-3">
+            <h6 class="fw-bold text-danger mb-2">
+                <i class="fas fa-times-circle me-2"></i>Words Missed or Mispronounced
+            </h6>
+            <div class="d-flex flex-wrap gap-2">
+                {% for word in scores.words_missed %}
+                <span class="badge px-3 py-2" style="background:#fce8e8;color:#d63031;font-size:0.85rem;border-radius:20px;">{{ word }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if scores.words_extra %}
+        <div>
+            <h6 class="fw-bold text-warning mb-2">
+                <i class="fas fa-plus-circle me-2"></i>Extra Words Added
+            </h6>
+            <div class="d-flex flex-wrap gap-2">
+                {% for word in scores.words_extra %}
+                <span class="badge px-3 py-2" style="background:#fef9e7;color:#e17055;font-size:0.85rem;border-radius:20px;">{{ word }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Passage Comparison -->
+<div class="card mb-4">
+    <div class="card-header fw-bold">
+        <i class="fas fa-columns me-2" style="color:#6c63ff;"></i>Passage Comparison
+    </div>
+    <div class="card-body">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <h6 class="fw-bold text-success mb-2"><i class="fas fa-book me-2"></i>Original Passage</h6>
+                <div style="background:#f0fdf4;border-radius:12px;padding:16px;font-size:0.95rem;line-height:1.9;font-family:'Nunito',sans-serif;border:1px solid #d4edda;">
+                    {{ passage_text }}
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h6 class="fw-bold" style="color:#6c63ff;" class="mb-2"><i class="fas fa-microphone me-2"></i>What You Said</h6>
+                <div style="background:#f8f4ff;border-radius:12px;padding:16px;font-size:0.95rem;line-height:1.9;font-family:'Nunito',sans-serif;border:1px solid #d8d1ff;">
+                    {{ transcribed_text }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AI Feedback -->
+<div class="card mb-4">
+    <div class="card-header fw-bold">
+        <i class="fas fa-robot me-2" style="color:#6c63ff;"></i>AI Feedback & Recommendations
+    </div>
+    <div class="card-body">
+
+        {% if scores.strengths %}
+        <div class="mb-4">
+            <h6 class="fw-bold text-success mb-3">
+                <i class="fas fa-star me-2"></i>Your Strengths
+            </h6>
+            {% for s in scores.strengths %}
+            <div class="d-flex align-items-start gap-2 mb-2 p-3"
+                 style="background:#f0fdf4;border-radius:10px;border-left:4px solid #00b894;">
+                <i class="fas fa-check-circle text-success mt-1"></i>
+                <span>{{ s }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if scores.improvements %}
+        <div class="mb-4">
+            <h6 class="fw-bold text-warning mb-3">
+                <i class="fas fa-lightbulb me-2"></i>Areas to Improve
+            </h6>
+            {% for imp in scores.improvements %}
+            <div class="d-flex align-items-start gap-2 mb-2 p-3"
+                 style="background:#fef9e7;border-radius:10px;border-left:4px solid #fdcb6e;">
+                <i class="fas fa-arrow-circle-right text-warning mt-1"></i>
+                <span>{{ imp }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if scores.feedback %}
+        <div>
+            <h6 class="fw-bold mb-3" style="color:#6c63ff;">
+                <i class="fas fa-info-circle me-2"></i>Additional Feedback
+            </h6>
+            {% for fb in scores.feedback %}
+            <div class="d-flex align-items-start gap-2 mb-2 p-3"
+                 style="background:#f8f4ff;border-radius:10px;border-left:4px solid #6c63ff;">
+                <i class="fas fa-comment-alt mt-1" style="color:#6c63ff;"></i>
+                <span>{{ fb }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- AI Tips based on score -->
+        <div class="mt-3 p-4" style="background:linear-gradient(135deg,#f8f4ff,#fff0f7);border-radius:14px;">
+            <h6 class="fw-bold mb-3" style="color:#6c63ff;">
+                <i class="fas fa-graduation-cap me-2"></i>Personalized Practice Tips
+            </h6>
+            {% if session.fluency_score < 60 %}
+            <p class="small mb-2">📚 <strong>Fluency:</strong> Read the same passage 3 times a day to build confidence and flow.</p>
+            {% endif %}
+            {% if session.pronunciation_score < 70 %}
+            <p class="small mb-2">🗣️ <strong>Pronunciation:</strong> Use the "Listen First" button to hear the correct pronunciation before recording.</p>
+            {% endif %}
+            {% if session.reading_speed_wpm < 60 and session.reading_speed_wpm > 0 %}
+            <p class="small mb-2">⚡ <strong>Speed:</strong> Try reading faster while maintaining clarity. Aim for 90+ words per minute.</p>
+            {% elif session.reading_speed_wpm > 250 %}
+            <p class="small mb-2">🐢 <strong>Pace:</strong> Slow down a little — accurate reading is better than fast reading.</p>
+            {% endif %}
+            {% if session.accuracy_score >= 85 %}
+            <p class="small mb-2">🌟 <strong>Excellent!</strong> You're reading accurately. Try a more challenging passage next time.</p>
+            {% endif %}
+            <p class="small mb-0">💡 <strong>General Tip:</strong> Practice daily for 10 minutes. Consistent practice improves reading speed, accuracy, and fluency over time.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Action Buttons -->
+<div class="d-flex gap-3 flex-wrap justify-content-center mb-5">
+    <a href="{% url 'speech:session' %}" class="btn btn-primary px-5 py-2 fw-bold">
+        <i class="fas fa-redo me-2"></i>Try Another Passage
+    </a>
+    <a href="{% url 'speech:sessions' %}" class="btn btn-outline-primary px-5 py-2 fw-bold">
+        <i class="fas fa-history me-2"></i>View All Sessions
+    </a>
+    <a href="{% url 'speech:tts' %}" class="btn btn-outline-secondary px-4 py-2">
+        <i class="fas fa-volume-up me-2"></i>Text to Speech
+    </a>
+    <a href="{% url 'learning:home' %}" class="btn btn-outline-success px-4 py-2">
+        <i class="fas fa-book-open me-2"></i>Learning Plans
+    </a>
+</div>
+
+</div>
+</div>
+{% endblock %}

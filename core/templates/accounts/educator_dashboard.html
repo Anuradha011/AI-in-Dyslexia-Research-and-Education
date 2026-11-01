@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% block title %}Educator Dashboard{% endblock %}
+{% block page_title %}Educator Dashboard{% endblock %}
+{% block content %}
+
+<!-- Stats Row -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card bg-purple">
+            <div class="d-flex justify-content-between align-items-start">
+                <div><div class="stat-value">{{ student_count }}</div><div class="stat-label">Total Students</div></div>
+                <i class="fas fa-user-graduate stat-icon"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card bg-teal">
+            <div class="d-flex justify-content-between align-items-start">
+                <div><div class="stat-value">{{ recent_assessments.count }}</div><div class="stat-label">Assessments</div></div>
+                <i class="fas fa-clipboard-check stat-icon"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card bg-orange">
+            <div class="d-flex justify-content-between align-items-start">
+                <div><div class="stat-value">{{ high_risk|length }}</div><div class="stat-label">High Risk Students</div></div>
+                <i class="fas fa-exclamation-triangle stat-icon"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card bg-pink">
+            <div class="d-flex justify-content-between align-items-start">
+                <div><div class="stat-value">{{ plan_count }}</div><div class="stat-label">Learning Plans</div></div>
+                <i class="fas fa-book-open stat-icon"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <!-- High Risk Alert -->
+    {% if high_risk %}
+    <div class="col-12">
+        <div class="card" style="border-left: 5px solid #d63031;">
+            <div class="card-header d-flex align-items-center gap-2">
+                <i class="fas fa-exclamation-circle text-danger"></i>
+                <span class="fw-bold text-danger">High Risk Students — Require Attention</span>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead><tr><th class="ps-3">Student</th><th>Risk Score</th><th>Last Assessment</th><th>Actions</th></tr></thead>
+                    <tbody>
+                    {% for a in high_risk %}
+                    <tr>
+                        <td class="ps-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <div style="width:34px;height:34px;background:linear-gradient(135deg,#d63031,#ff7675);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:0.85rem;flex-shrink:0;">{{ a.student.username|first|upper }}</div>
+                                <div>
+                                    <div class="fw-bold">{{ a.student.get_full_name|default:a.student.username }}</div>
+                                    <div class="text-muted small">{{ a.student.institution|default:"No institution" }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="badge risk-high px-3 py-2">{{ a.risk_score|floatformat:1 }} / 100</span></td>
+                        <td class="text-muted small">{{ a.created_at|date:"M d, Y" }}</td>
+                        <td class="d-flex gap-1 flex-wrap">
+                            <a href="{% url 'accounts:student_detail' a.student.pk %}" class="btn btn-sm btn-outline-primary">View Profile</a>
+                            <a href="{% url 'learning:create_plan' a.student.pk %}" class="btn btn-sm btn-primary">+ Create Plan</a>
+                            <a href="{% url 'reports:generate' a.student.pk %}" class="btn btn-sm btn-outline-success">Generate Report</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<div class="row g-4">
+    <!-- Student List -->
+    <div class="col-lg-7">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-user-graduate me-2" style="color:#6c63ff;"></i>All Students</span>
+                <span class="badge bg-light text-dark border">{{ student_count }} total</span>
+            </div>
+            <div class="card-body p-0" style="max-height:480px;overflow-y:auto;">
+                {% for student in students %}
+                <div class="d-flex align-items-center p-3 border-bottom" style="transition:background 0.2s;" onmouseover="this.style.background='#f8f4ff'" onmouseout="this.style.background=''">
+                    <div style="width:40px;height:40px;background:linear-gradient(135deg,#6c63ff,#a29bfe);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;flex-shrink:0;margin-right:12px;">{{ student.username|first|upper }}</div>
+                    <div class="flex-grow-1">
+                        <div class="fw-bold small">{{ student.get_full_name|default:student.username }}</div>
+                        <div class="text-muted" style="font-size:0.75rem;">
+                            {{ student.institution|default:"No institution" }}
+                            {% if student.student_profile.dyslexia_risk_score > 0 %}
+                            · Risk: <strong>{{ student.student_profile.dyslexia_risk_score|floatformat:0 }}</strong>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="d-flex gap-1">
+                        <a href="{% url 'accounts:student_detail' student.pk %}" class="btn btn-sm btn-outline-primary">Profile</a>
+                        <a href="{% url 'learning:create_plan' student.pk %}" class="btn btn-sm btn-outline-success" title="Create Learning Plan">
+                            <i class="fas fa-plus"></i>
+                        </a>
+                        <a href="{% url 'reports:generate' student.pk %}" class="btn btn-sm btn-outline-secondary" title="Generate Report">
+                            <i class="fas fa-file-alt"></i>
+                        </a>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-5 text-muted">
+                    <i class="fas fa-user-graduate fa-3x mb-3 opacity-25"></i>
+                    <p>No students registered yet.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Assessments -->
+    <div class="col-lg-5">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-clipboard-list me-2 text-success"></i>Recent Assessments</span>
+                <a href="{% url 'assessment:list' %}" class="btn btn-sm btn-outline-success">View All</a>
+            </div>
+            <div class="card-body p-0" style="max-height:480px;overflow-y:auto;">
+                {% for a in recent_assessments %}
+                <div class="p-3 border-bottom">
+                    <div class="d-flex justify-content-between align-items-start mb-1">
+                        <span class="fw-bold small">{{ a.student.username }}</span>
+                        <span class="badge risk-{{ a.risk_level|default:'low' }}">{{ a.risk_level|default:"pending"|title }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted" style="font-size:0.75rem;">{{ a.title|truncatechars:30 }}</span>
+                        <span class="text-muted" style="font-size:0.75rem;">{{ a.created_at|date:"M d" }}</span>
+                    </div>
+                    {% if a.comprehension_score %}
+                    <div class="progress mt-2" style="height:5px;">
+                        <div class="progress-bar" style="background:#6c63ff;width:{{ a.comprehension_score }}%"></div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% empty %}
+                <div class="text-center py-4 text-muted small">No assessments yet.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

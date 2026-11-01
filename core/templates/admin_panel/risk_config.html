@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}Risk Scoring Config{% endblock %}
+{% block page_title %}Risk Scoring Configuration{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-lg-8">
+<div class="alert alert-warning mb-4">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    <strong>Important:</strong> Changing these weights affects how dyslexia risk is calculated for ALL future assessments. Ensure weights sum to 1.0 (100%).
+</div>
+<div class="card">
+    <div class="card-header d-flex align-items-center gap-2">
+        <i class="fas fa-sliders-h" style="color:#6c63ff;"></i>
+        <span class="fw-bold">Risk Scoring Parameters — {{ config.name }}</span>
+        <span class="badge bg-success ms-auto">Active</span>
+    </div>
+    <div class="card-body p-4">
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3"><label class="form-label">Configuration Name</label><input type="text" name="name" class="form-control" value="{{ config.name }}"></div>
+
+            <h6 class="fw-bold mt-4 mb-3" style="color:#6c63ff;"><i class="fas fa-weight me-2"></i>Factor Weights (must total 1.0)</h6>
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label class="form-label">Phonological Processing Weight</label>
+                    <div class="input-group"><input type="number" name="phonological_weight" class="form-control" value="{{ config.phonological_weight }}" step="0.01" min="0" max="1"><span class="input-group-text">× 100%</span></div>
+                    <small class="text-muted">Currently: {{ config.phonological_weight|floatformat:0 }}% of risk score</small>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Error Rate Weight</label>
+                    <div class="input-group"><input type="number" name="error_rate_weight" class="form-control" value="{{ config.error_rate_weight }}" step="0.01" min="0" max="1"><span class="input-group-text">× 100%</span></div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Working Memory Weight</label>
+                    <div class="input-group"><input type="number" name="working_memory_weight" class="form-control" value="{{ config.working_memory_weight }}" step="0.01" min="0" max="1"><span class="input-group-text">× 100%</span></div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Comprehension Weight</label>
+                    <div class="input-group"><input type="number" name="comprehension_weight" class="form-control" value="{{ config.comprehension_weight }}" step="0.01" min="0" max="1"><span class="input-group-text">× 100%</span></div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Family History Weight</label>
+                    <div class="input-group"><input type="number" name="family_history_weight" class="form-control" value="{{ config.family_history_weight }}" step="0.01" min="0" max="1"><span class="input-group-text">× 100%</span></div>
+                </div>
+            </div>
+
+            <h6 class="fw-bold mt-2 mb-3" style="color:#e17055;"><i class="fas fa-flag me-2"></i>Risk Thresholds</h6>
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label class="form-label">High Risk Threshold</label>
+                    <div class="input-group"><input type="number" name="high_risk_threshold" class="form-control" value="{{ config.high_risk_threshold }}" step="0.5" min="0" max="100"><span class="input-group-text">/ 100</span></div>
+                    <small class="text-muted">Score above this = High Risk</small>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Moderate Risk Threshold</label>
+                    <div class="input-group"><input type="number" name="moderate_risk_threshold" class="form-control" value="{{ config.moderate_risk_threshold }}" step="0.5" min="0" max="100"><span class="input-group-text">/ 100</span></div>
+                    <small class="text-muted">Score above this = Moderate Risk</small>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary flex-grow-1 py-2"><i class="fas fa-save me-2"></i>Save Configuration</button>
+                <a href="{% url 'admin_panel:model_management' %}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+</div></div>
+{% endblock %}

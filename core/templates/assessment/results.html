@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}Assessment Results{% endblock %}
+{% block page_title %}Assessment Results{% endblock %}
+{% block content %}
+<div class="row g-4">
+<div class="col-lg-8">
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span><i class="fas fa-chart-pie me-2" style="color:#6c63ff;"></i>{{ assessment.title }}</span>
+            <span class="badge risk-{{ assessment.risk_level }} px-3 py-2">{{ assessment.get_risk_level_display }}</span>
+        </div>
+        <div class="card-body">
+            <div class="row g-3 mb-4">
+                <div class="col-6 col-md-3 text-center">
+                    <div style="background:#ede9ff;border-radius:14px;padding:16px;">
+                        <div style="font-size:1.8rem;font-weight:800;color:#6c63ff;">{{ assessment.comprehension_score|default:0|floatformat:1 }}%</div>
+                        <div class="text-muted small fw-bold">Comprehension</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3 text-center">
+                    <div style="background:#e0f7ef;border-radius:14px;padding:16px;">
+                        <div style="font-size:1.8rem;font-weight:800;color:#00b894;">{{ assessment.phonological_score|default:0|floatformat:1 }}%</div>
+                        <div class="text-muted small fw-bold">Phonological</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3 text-center">
+                    <div style="background:#fff0f7;border-radius:14px;padding:16px;">
+                        <div style="font-size:1.8rem;font-weight:800;color:#e84393;">{{ assessment.working_memory_score|default:0|floatformat:1 }}%</div>
+                        <div class="text-muted small fw-bold">Memory</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3 text-center">
+                    <div style="background:#fff3e0;border-radius:14px;padding:16px;">
+                        <div style="font-size:1.8rem;font-weight:800;color:#e17055;">{{ assessment.reading_speed_wpm|default:0|floatformat:0 }}</div>
+                        <div class="text-muted small fw-bold">WPM</div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-3 mb-3" style="background:#f0fdf4;border-radius:12px;border-left:4px solid #00b894;">
+                <h6 class="fw-bold text-success mb-1"><i class="fas fa-robot me-2"></i>AI Analysis</h6>
+                <p class="mb-0 small">{{ assessment.ai_analysis }}</p>
+            </div>
+            <div class="p-3" style="background:#f8f4ff;border-radius:12px;border-left:4px solid #6c63ff;">
+                <h6 class="fw-bold mb-1" style="color:#6c63ff;"><i class="fas fa-lightbulb me-2"></i>Recommendations</h6>
+                <p class="mb-0 small">{{ assessment.recommendations }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-lg-4">
+    <div class="card mb-3">
+        <div class="card-body">
+            <h6 class="fw-bold mb-3">Risk Score</h6>
+            <div class="text-center mb-3">
+                <div style="font-size:3rem;font-weight:800;color:{% if assessment.risk_level == 'high' %}#d63031{% elif assessment.risk_level == 'moderate' %}#e17055{% else %}#00b894{% endif %};">
+                    {{ assessment.risk_score|floatformat:1 }}
+                </div>
+                <span class="badge risk-{{ assessment.risk_level }} px-3 py-2">{{ assessment.get_risk_level_display }}</span>
+            </div>
+            <div class="progress mb-2" style="height:10px;">
+                <div class="progress-bar {% if assessment.risk_level == 'high' %}bg-danger{% elif assessment.risk_level == 'moderate' %}bg-warning{% else %}bg-success{% endif %}" style="width:{{ assessment.risk_score }}%"></div>
+            </div>
+            <p class="text-muted small text-center">Higher score = higher risk</p>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body d-grid gap-2">
+            <a href="{% url 'learning:home' %}" class="btn btn-primary"><i class="fas fa-book-open me-2"></i>Go to Learning Plans</a>
+            <a href="{% url 'speech:home' %}" class="btn btn-outline-primary"><i class="fas fa-microphone me-2"></i>Practice Speech</a>
+            <a href="{% url 'assessment:list' %}" class="btn btn-outline-secondary">← All Assessments</a>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

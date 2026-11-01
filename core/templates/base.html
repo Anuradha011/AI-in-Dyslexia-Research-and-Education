@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}DyslexiaCare Platform{% endblock %}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6c63ff;
+            --primary-light: #a29bfe;
+            --secondary: #fd79a8;
+            --success: #00b894;
+            --warning: #fdcb6e;
+            --danger: #d63031;
+            --info: #74b9ff;
+            --sidebar-w: 265px;
+            --bg: #f4f6fb;
+            --card-bg: #ffffff;
+            --text: #2d3436;
+            --text-muted: #636e72;
+            --border: #e9ecef;
+        }
+        * { font-family: 'Nunito', sans-serif; }
+        body { background: var(--bg); color: var(--text); min-height: 100vh; }
+
+        /* ── Sidebar ── */
+        .sidebar {
+            width: var(--sidebar-w);
+            background: linear-gradient(160deg, #6c63ff 0%, #a29bfe 50%, #fd79a8 100%);
+            height: 100vh;
+            position: fixed;
+            top: 0; left: 0;
+            z-index: 1000;
+            overflow-y: auto;
+            overflow-x: hidden;
+            box-shadow: 6px 0 30px rgba(108,99,255,0.25);
+            transition: all 0.3s;
+        }
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 2px; }
+
+        .sidebar-brand {
+            padding: 24px 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        .sidebar-brand .logo {
+            width: 44px; height: 44px;
+            background: rgba(255,255,255,0.25);
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 12px;
+            backdrop-filter: blur(10px);
+        }
+        .sidebar-brand h5 {
+            color: #fff; font-weight: 800; font-size: 1rem;
+            margin: 0; line-height: 1.3;
+        }
+        .sidebar-brand p { color: rgba(255,255,255,0.7); font-size: 0.75rem; margin: 0; }
+
+        .nav-section-label {
+            font-size: 0.65rem; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 1.8px;
+            color: rgba(255,255,255,0.5);
+            padding: 18px 20px 6px;
+        }
+        .sidebar-nav .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 10px 14px;
+            margin: 2px 10px;
+            border-radius: 12px;
+            display: flex; align-items: center; gap: 11px;
+            font-size: 0.875rem; font-weight: 600;
+            transition: all 0.2s;
+        }
+        .sidebar-nav .nav-link:hover,
+        .sidebar-nav .nav-link.active {
+            background: rgba(255,255,255,0.22);
+            color: #fff;
+            transform: translateX(4px);
+        }
+        .sidebar-nav .nav-link i { width: 18px; text-align: center; font-size: 0.95rem; }
+
+        .sidebar-user {
+            padding: 16px 20px;
+            margin: 10px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 14px;
+            display: flex; align-items: center; gap: 10px;
+            backdrop-filter: blur(10px);
+        }
+        .sidebar-user .avatar {
+            width: 36px; height: 36px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%; display: flex;
+            align-items: center; justify-content: center;
+            font-weight: 800; color: #fff; font-size: 0.9rem;
+        }
+        .sidebar-user .user-info .name { color: #fff; font-weight: 700; font-size: 0.85rem; }
+        .sidebar-user .user-info .role-badge {
+            font-size: 0.65rem; font-weight: 700;
+            background: rgba(255,255,255,0.25);
+            color: #fff; padding: 2px 8px; border-radius: 20px;
+        }
+
+        /* ── Main Layout ── */
+        .main-content { margin-left: var(--sidebar-w); min-height: 100vh; }
+
+        .topbar {
+            background: #fff;
+            padding: 14px 30px;
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; z-index: 99;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+        }
+        .topbar .page-title { font-weight: 800; font-size: 1.1rem; color: var(--text); margin: 0; }
+        .topbar .breadcrumb { font-size: 0.8rem; color: var(--text-muted); margin: 0; }
+
+        .content-area { padding: 28px 30px; }
+
+        /* ── Cards ── */
+        .card {
+            border: none; border-radius: 18px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+            background: var(--card-bg);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
+        .card-header {
+            background: transparent;
+            border-bottom: 1px solid var(--border);
+            padding: 18px 22px;
+            font-weight: 700; font-size: 0.95rem;
+        }
+        .card-body { padding: 22px; }
+
+        /* ── Stat Cards ── */
+        .stat-card {
+            border-radius: 18px; padding: 24px;
+            color: #fff; position: relative; overflow: hidden;
+            border: none;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute; top: -20px; right: -20px;
+            width: 100px; height: 100px; border-radius: 50%;
+            background: rgba(255,255,255,0.12);
+        }
+        .stat-card::after {
+            content: '';
+            position: absolute; bottom: -30px; right: 20px;
+            width: 70px; height: 70px; border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+        }
+        .stat-card .stat-icon { font-size: 2.2rem; opacity: 0.85; }
+        .stat-card .stat-value { font-size: 2.4rem; font-weight: 800; line-height: 1.1; }
+        .stat-card .stat-label { font-size: 0.85rem; opacity: 0.85; font-weight: 600; }
+        .bg-purple { background: linear-gradient(135deg, #6c63ff, #a29bfe); }
+        .bg-pink { background: linear-gradient(135deg, #e84393, #fd79a8); }
+        .bg-teal { background: linear-gradient(135deg, #00b894, #55efc4); }
+        .bg-orange { background: linear-gradient(135deg, #e17055, #fdcb6e); }
+        .bg-blue { background: linear-gradient(135deg, #0984e3, #74b9ff); }
+        .bg-red { background: linear-gradient(135deg, #d63031, #ff7675); }
+
+        /* ── Risk Badges ── */
+        .risk-low { background: #e8f8f5; color: #00b894; font-weight: 700; }
+        .risk-moderate { background: #fef9e7; color: #e67e22; font-weight: 700; }
+        .risk-high { background: #fce8e8; color: #d63031; font-weight: 700; }
+
+        /* ── Progress Bars ── */
+        .progress { border-radius: 20px; overflow: hidden; }
+        .progress-bar { border-radius: 20px; }
+
+        /* ── Tables ── */
+        .table th {
+            font-weight: 700; font-size: 0.75rem;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            color: var(--text-muted); border-top: none;
+            padding: 12px 16px;
+        }
+        .table td { padding: 12px 16px; vertical-align: middle; font-size: 0.875rem; }
+        .table-hover tbody tr:hover { background: #f8f4ff; }
+
+        /* ── Forms ── */
+        .form-control, .form-select {
+            border: 1.5px solid #e9ecef; border-radius: 12px;
+            padding: 10px 14px; font-size: 0.875rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(108,99,255,0.15);
+        }
+        .form-label { font-weight: 700; font-size: 0.85rem; color: var(--text); margin-bottom: 6px; }
+
+        /* ── Buttons ── */
+        .btn { border-radius: 12px; font-weight: 700; font-size: 0.875rem; padding: 9px 20px; }
+        .btn-primary { background: linear-gradient(135deg, #6c63ff, #a29bfe); border: none; }
+        .btn-primary:hover { background: linear-gradient(135deg, #5a52e0, #8a80f5); transform: translateY(-1px); }
+        .btn-success { background: linear-gradient(135deg, #00b894, #55efc4); border: none; color: #fff; }
+        .btn-danger { background: linear-gradient(135deg, #d63031, #ff7675); border: none; }
+
+        /* ── Alerts ── */
+        .alert { border: none; border-radius: 14px; font-size: 0.875rem; }
+
+        /* ── Role tag ── */
+        .role-tag {
+            display: inline-block; padding: 3px 12px;
+            border-radius: 20px; font-size: 0.7rem; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .role-student { background: #ede9ff; color: #6c63ff; }
+        .role-educator { background: #e0f7ef; color: #00b894; }
+        .role-parent { background: #fff0f7; color: #e84393; }
+        .role-admin { background: #fff3e0; color: #e17055; }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .main-content { margin-left: 0; }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+{% if user.is_authenticated %}
+<div class="sidebar">
+    <div class="sidebar-brand">
+        <div class="logo"><i class="fas fa-brain text-white fa-lg"></i></div>
+        <h5>DyslexiaCare</h5>
+        <p>AI Learning Platform</p>
+    </div>
+
+    <!-- User card -->
+    <div class="sidebar-user mt-3">
+        <div class="avatar">{{ user.username|first|upper }}</div>
+        <div class="user-info">
+            <div class="name">{{ user.get_full_name|default:user.username|truncatechars:16 }}</div>
+            <div class="role-badge">{{ user.role|title }}</div>
+        </div>
+    </div>
+
+    <nav class="sidebar-nav mt-2 pb-4">
+    <div class="nav-section-label">Main</div>
+    <a href="{% url 'dashboard:dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+        <i class="fas fa-home"></i> Dashboard
+    </a>
+
+    {% if user.role == 'student' %}
+    <!-- STUDENT NAV -->
+    <div class="nav-section-label">My Learning</div>
+    <a href="{% url 'assessment:list' %}" class="nav-link">
+        <i class="fas fa-clipboard-check"></i> My Assessments
+    </a>
+    <a href="{% url 'assessment:start' %}" class="nav-link">
+        <i class="fas fa-play-circle"></i> Start Assessment
+    </a>
+    <a href="{% url 'learning:home' %}" class="nav-link">
+        <i class="fas fa-book-open"></i> Learning Plans
+    </a>
+    <a href="{% url 'learning:exercises' %}" class="nav-link">
+        <i class="fas fa-pen-nib"></i> Exercises
+    </a>
+    <a href="{% url 'learning:progress' %}" class="nav-link">
+        <i class="fas fa-chart-line"></i> My Progress
+    </a>
+    <div class="nav-section-label">Tools</div>
+    <a href="{% url 'speech:home' %}" class="nav-link">
+        <i class="fas fa-microphone"></i> Speech Practice
+    </a>
+    <a href="{% url 'speech:tts' %}" class="nav-link">
+        <i class="fas fa-volume-up"></i> Text to Speech
+    </a>
+    <div class="nav-section-label">Reports</div>
+    <a href="{% url 'reports:list' %}" class="nav-link">
+        <i class="fas fa-file-alt"></i> My Reports
+    </a>
+
+    {% elif user.role == 'educator' %}
+    <!-- EDUCATOR NAV -->
+    <div class="nav-section-label">Students</div>
+    <a href="{% url 'accounts:educator_dashboard' %}" class="nav-link">
+        <i class="fas fa-chalkboard-teacher"></i> Educator Panel
+    </a>
+    <a href="{% url 'accounts:user_list' %}" class="nav-link">
+        <i class="fas fa-user-graduate"></i> All Students
+    </a>
+    <div class="nav-section-label">Assessments</div>
+    <a href="{% url 'assessment:list' %}" class="nav-link">
+        <i class="fas fa-clipboard-check"></i> All Assessments
+    </a>
+    <div class="nav-section-label">Learning</div>
+    <a href="{% url 'learning:home' %}" class="nav-link">
+        <i class="fas fa-book-open"></i> Learning Plans
+    </a>
+    <a href="{% url 'learning:exercises' %}" class="nav-link">
+        <i class="fas fa-pen-nib"></i> Exercises
+    </a>
+    <a href="{% url 'learning:progress' %}" class="nav-link">
+        <i class="fas fa-chart-line"></i> Progress Tracker
+    </a>
+    <div class="nav-section-label">Clinical</div>
+    <a href="{% url 'neuroimaging:list' %}" class="nav-link">
+        <i class="fas fa-brain"></i> Neuroimaging
+    </a>
+    <div class="nav-section-label">Reports</div>
+    <a href="{% url 'reports:list' %}" class="nav-link">
+        <i class="fas fa-file-alt"></i> Reports
+    </a>
+
+    {% elif user.role == 'parent' %}
+    <!-- PARENT NAV -->
+    <div class="nav-section-label">My Children</div>
+    <a href="{% url 'accounts:parent_dashboard' %}" class="nav-link">
+        <i class="fas fa-child"></i> Parent Panel
+    </a>
+    <a href="{% url 'admin_panel:parent_requests' %}" class="nav-link">
+    <i class="fas fa-user-shield"></i> Parent Requests
+    {% if pending_requests_count > 0 %}
+    <span class="badge bg-warning text-dark ms-auto">{{ pending_requests_count }}</span>
+    {% endif %}
+    </a>
+    <div class="nav-section-label">Progress</div>
+    <a href="{% url 'assessment:list' %}" class="nav-link">
+        <i class="fas fa-clipboard-check"></i> Assessments
+    </a>
+    <a href="{% url 'reports:list' %}" class="nav-link">
+        <i class="fas fa-file-alt"></i> Progress Reports
+    </a>
+    <a href="{% url 'learning:progress' %}" class="nav-link">
+        <i class="fas fa-chart-line"></i> Learning Progress
+    </a>
+
+    {% elif user.is_admin_user %}
+    <!-- ADMIN NAV -->
+    <div class="nav-section-label">AI Management</div>
+<a href="{% url 'admin_panel:model_management' %}" class="nav-link">
+    <i class="fas fa-robot"></i> AI Models
+</a>
+<a href="{% url 'admin_panel:risk_config' %}" class="nav-link">
+    <i class="fas fa-sliders-h"></i> Risk Config
+</a>
+<a href="{% url 'admin_panel:model_performance' %}" class="nav-link">
+    <i class="fas fa-chart-bar"></i> Model Performance
+</a>
+<div class="nav-section-label">Content & Config</div>
+<a href="{% url 'admin_panel:content_management' %}" class="nav-link">
+    <i class="fas fa-pen-alt"></i> Content Manager
+</a>
+<a href="{% url 'admin_panel:nlp_config' %}" class="nav-link">
+    <i class="fas fa-microphone-alt"></i> NLP Config
+</a>
+<a href="{% url 'admin_panel:language_management' %}" class="nav-link">
+    <i class="fas fa-globe"></i> Languages
+</a>
+<div class="nav-section-label">Governance</div>
+<a href="{% url 'admin_panel:bias_monitoring' %}" class="nav-link">
+    <i class="fas fa-balance-scale"></i> Bias Monitor
+</a>
+<a href="{% url 'admin_panel:compliance' %}" class="nav-link">
+    <i class="fas fa-file-contract"></i> Compliance
+</a>
+
+    {% endif %}
+
+    <!-- Common for all -->
+    <div class="nav-section-label">Settings</div>
+    <a href="{% url 'accessibility:settings' %}" class="nav-link">
+        <i class="fas fa-universal-access"></i> Accessibility
+    </a>
+    <a href="{% url 'accounts:profile' %}" class="nav-link">
+        <i class="fas fa-user-circle"></i> Profile
+    </a>
+    <div class="mt-3 mx-2">
+        <a href="{% url 'accounts:logout' %}" class="nav-link" style="background:rgba(255,255,255,0.15);">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </div>
+</nav>
+</div>
+
+<div class="main-content">
+    <div class="topbar">
+        <div>
+            <h6 class="page-title">{% block page_title %}Dashboard{% endblock %}</h6>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <a href="{% url 'accessibility:settings' %}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-adjust me-1"></i>Accessibility
+            </a>
+            <span class="role-tag role-{{ user.role }}">{{ user.role|title }}</span>
+        </div>
+    </div>
+
+    <div class="content-area">
+        {% if messages %}
+        {% for msg in messages %}
+        <div class="alert alert-{{ msg.tags }} alert-dismissible fade show mb-3">
+            {{ msg }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% block content %}{% endblock %}
+    </div>
+</div>
+
+{% else %}
+{% block auth_content %}{% endblock %}
+{% endif %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

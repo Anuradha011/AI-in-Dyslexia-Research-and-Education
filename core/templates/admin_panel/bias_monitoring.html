@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}Bias Monitoring{% endblock %}
+{% block page_title %}AI Bias & Fairness Monitoring{% endblock %}
+{% block content %}
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3"><div class="stat-card bg-purple"><div class="d-flex justify-content-between"><div><div class="stat-value">{{ total_assessed }}</div><div class="stat-label">Total Assessed</div></div><i class="fas fa-users stat-icon"></i></div></div></div>
+    <div class="col-md-3"><div class="stat-card bg-red"><div class="d-flex justify-content-between"><div><div class="stat-value">{{ high_count }}</div><div class="stat-label">High Risk</div></div><i class="fas fa-exclamation-triangle stat-icon"></i></div></div></div>
+    <div class="col-md-3"><div class="stat-card bg-orange"><div class="d-flex justify-content-between"><div><div class="stat-value">{{ moderate_count }}</div><div class="stat-label">Moderate Risk</div></div><i class="fas fa-minus-circle stat-icon"></i></div></div></div>
+    <div class="col-md-3"><div class="stat-card bg-teal"><div class="d-flex justify-content-between"><div><div class="stat-value">{{ low_count }}</div><div class="stat-label">Low Risk</div></div><i class="fas fa-check-circle stat-icon"></i></div></div></div>
+</div>
+
+{% if latest %}
+<div class="card mb-4" style="border-left:5px solid #00b894;">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-balance-scale me-2 text-success"></i>Latest Bias Report — {{ latest.report_title }}</span>
+        <span class="badge bg-success px-3">Fairness: {{ latest.overall_fairness_score|floatformat:1 }}%</span>
+    </div>
+    <div class="card-body">
+        <div class="row g-3 mb-3 text-center">
+            <div class="col-md-3"><div style="background:#ede9ff;border-radius:12px;padding:14px;"><div style="font-size:1.6rem;font-weight:800;color:#6c63ff;">{{ latest.gender_bias_score|floatformat:1 }}%</div><div class="text-muted small fw-bold">Gender Fairness</div></div></div>
+            <div class="col-md-3"><div style="background:#e0f7ef;border-radius:12px;padding:14px;"><div style="font-size:1.6rem;font-weight:800;color:#00b894;">{{ latest.age_bias_score|floatformat:1 }}%</div><div class="text-muted small fw-bold">Age Fairness</div></div></div>
+            <div class="col-md-3"><div style="background:#fff3e0;border-radius:12px;padding:14px;"><div style="font-size:1.6rem;font-weight:800;color:#e17055;">{{ latest.language_bias_score|floatformat:1 }}%</div><div class="text-muted small fw-bold">Language Fairness</div></div></div>
+            <div class="col-md-3"><div style="background:{% if latest.overall_fairness_score >= 85 %}#e0f7ef{% else %}#fce8e8{% endif %};border-radius:12px;padding:14px;"><div style="font-size:1.6rem;font-weight:800;color:{% if latest.overall_fairness_score >= 85 %}#00b894{% else %}#d63031{% endif %};">{{ latest.overall_fairness_score|floatformat:1 }}%</div><div class="text-muted small fw-bold">Overall</div></div></div>
+        </div>
+        <div class="p-3 mb-2" style="background:#f0fdf4;border-radius:10px;"><strong>Findings:</strong><p class="mb-0 mt-1 small">{{ latest.findings }}</p></div>
+        <div class="p-3" style="background:#f8f4ff;border-radius:10px;"><strong>Recommendations:</strong><p class="mb-0 mt-1 small">{{ latest.recommendations }}</p></div>
+    </div>
+</div>
+{% endif %}
+
+<div class="d-flex justify-content-between mb-3">
+    <h6 class="fw-bold mb-0">Report History</h6>
+    <a href="{% url 'admin_panel:generate_bias_report' %}" class="btn btn-primary"><i class="fas fa-robot me-2"></i>Generate New Report</a>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead><tr><th class="ps-3">Report</th><th>Assessments</th><th>Gender</th><th>Age</th><th>Language</th><th>Overall</th><th>Date</th></tr></thead>
+            <tbody>
+            {% for r in reports %}
+            <tr>
+                <td class="ps-3 fw-bold">{{ r.report_title }}</td>
+                <td>{{ r.total_assessments_reviewed }}</td>
+                <td>{{ r.gender_bias_score|floatformat:1 }}%</td>
+                <td>{{ r.age_bias_score|floatformat:1 }}%</td>
+                <td>{{ r.language_bias_score|floatformat:1 }}%</td>
+                <td><span class="badge {% if r.overall_fairness_score >= 85 %}bg-success{% else %}bg-warning text-dark{% endif %}">{{ r.overall_fairness_score|floatformat:1 }}%</span></td>
+                <td class="text-muted small">{{ r.evaluation_date }}</td>
+            </tr>
+            {% empty %}<tr><td colspan="7" class="text-center py-4 text-muted">No reports yet. Click "Generate New Report".</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Upload Scan{% endblock %}
+{% block page_title %}Upload Neuroimaging Scan{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-lg-7">
+<div class="card"><div class="card-header"><i class="fas fa-upload me-2"></i>Upload Brain Scan</div>
+<div class="card-body p-4">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="mb-3"><label class="form-label">Patient (Student) *</label>
+            <select name="patient" class="form-select" required>
+                <option value="">Select student...</option>
+                {% for s in students %}<option value="{{ s.pk }}">{{ s.get_full_name|default:s.username }}</option>{% endfor %}
+            </select>
+        </div>
+        <div class="mb-3"><label class="form-label">Scan Type *</label>
+            <select name="scan_type" class="form-select" required>
+                <option value="fmri">fMRI</option><option value="eeg">EEG</option>
+                <option value="mri">Structural MRI</option><option value="other">Other</option>
+            </select>
+        </div>
+        <div class="mb-3"><label class="form-label">Upload File *</label><input type="file" name="file" class="form-control" required></div>
+        <div class="mb-4"><label class="form-label">Description</label><textarea name="description" class="form-control" rows="3"></textarea></div>
+        <div class="alert alert-info small"><i class="fas fa-shield-alt me-2"></i>All neuroimaging data is stored securely and handled in compliance with data protection standards.</div>
+        <button type="submit" class="btn btn-primary">Upload Scan</button>
+        <a href="{% url 'neuroimaging:list' %}" class="btn btn-outline-secondary ms-2">Cancel</a>
+    </form>
+</div></div>
+</div></div>
+{% endblock %}

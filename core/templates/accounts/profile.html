@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}My Profile{% endblock %}
+{% block page_title %}My Profile{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-lg-6">
+<div class="card">
+    <div class="card-body p-4 text-center">
+        <div style="width:80px;height:80px;background:linear-gradient(135deg,#6c63ff,#fd79a8);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:2rem;font-weight:800;color:#fff;">{{ user.username|first|upper }}</div>
+        <h5 class="fw-bold">{{ user.get_full_name|default:user.username }}</h5>
+        <span class="role-tag role-{{ user.role }} mb-3 d-inline-block">{{ user.role|title }}</span>
+        <table class="table text-start mt-3">
+            <tr><td class="text-muted">Username</td><td class="fw-bold">{{ user.username }}</td></tr>
+            <tr><td class="text-muted">Email</td><td>{{ user.email }}</td></tr>
+            <tr><td class="text-muted">Institution</td><td>{{ user.institution|default:"—" }}</td></tr>
+            <tr><td class="text-muted">Language</td><td>{{ user.preferred_language }}</td></tr>
+            <tr><td class="text-muted">Joined</td><td>{{ user.created_at|date:"M d, Y" }}</td></tr>
+        </table>
+        <a href="{% url 'accessibility:settings' %}" class="btn btn-outline-primary w-100 mt-2">Accessibility Settings</a>
+    </div>
+</div>
+</div></div>
+{% endblock %}

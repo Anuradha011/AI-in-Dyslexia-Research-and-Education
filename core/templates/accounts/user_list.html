@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}User Management{% endblock %}
+{% block page_title %}User Management{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header"><i class="fas fa-users-cog me-2"></i>All Users ({{ users.count }})</div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead><tr><th class="ps-3">User</th><th>Email</th><th>Role</th><th>Institution</th><th>Joined</th><th>Actions</th></tr></thead>
+            <tbody>
+            {% for u in users %}
+            <tr>
+                <td class="ps-3 fw-bold">{{ u.username }}</td>
+                <td>{{ u.email }}</td>
+                <td>
+                    <form method="post" action="{% url 'accounts:change_role' u.pk %}" class="d-inline-flex gap-1">
+                        {% csrf_token %}
+                        <select name="role" class="form-select form-select-sm" style="width:120px;">
+                            <option value="student" {% if u.role == 'student' %}selected{% endif %}>Student</option>
+                            <option value="educator" {% if u.role == 'educator' %}selected{% endif %}>Educator</option>
+                            <option value="parent" {% if u.role == 'parent' %}selected{% endif %}>Parent</option>
+                            <option value="admin" {% if u.role == 'admin' %}selected{% endif %}>Admin</option>
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-outline-secondary">Set</button>
+                    </form>
+                </td>
+                <td class="text-muted">{{ u.institution|default:"—" }}</td>
+                <td class="text-muted small">{{ u.created_at|date:"M d, Y" }}</td>
+                <td>
+                    {% if u != request.user %}
+                    <a href="{% url 'accounts:delete_user' u.pk %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete {{ u.username }}?')">Delete</a>
+                    {% endif %}
+                    {% if u.role == 'student' %}
+                    <a href="{% url 'learning:create_plan' u.pk %}" class="btn btn-sm btn-outline-primary ms-1">+ Plan</a>
+                    <a href="{% url 'reports:generate' u.pk %}" class="btn btn-sm btn-outline-success ms-1">Report</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

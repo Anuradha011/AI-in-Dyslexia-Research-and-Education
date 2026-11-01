@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Compliance{% endblock %}
+{% block page_title %}Data Privacy & Compliance Policies{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <p class="text-muted mb-0">{{ policies.count }} policies on record</p>
+    <a href="{% url 'admin_panel:add_policy' %}" class="btn btn-primary"><i class="fas fa-plus me-2"></i>Add Policy</a>
+</div>
+<div class="row g-4">
+{% for policy in policies %}
+<div class="col-lg-6">
+    <div class="card h-100" style="border-left:4px solid {% if policy.policy_type == 'privacy' %}#6c63ff{% elif policy.policy_type == 'bias' %}#d63031{% elif policy.policy_type == 'consent' %}#00b894{% else %}#fdcb6e{% endif %};">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <span class="badge bg-light text-dark border">{{ policy.get_policy_type_display }}</span>
+                <div class="d-flex gap-1 align-items-center">
+                    <span class="text-muted small">v{{ policy.version }}</span>
+                    {% if policy.is_active %}<span class="badge bg-success ms-1">Active</span>{% else %}<span class="badge bg-secondary ms-1">Inactive</span>{% endif %}
+                </div>
+            </div>
+            <h6 class="fw-bold">{{ policy.title }}</h6>
+            <p class="text-muted small mb-3">{{ policy.content|truncatechars:150 }}</p>
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="text-muted small">Updated {{ policy.updated_at|date:"M d, Y" }}</span>
+                <a href="{% url 'admin_panel:edit_policy' policy.pk %}" class="btn btn-sm btn-outline-primary">Edit</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% empty %}
+<div class="col-12"><div class="card p-5 text-center text-muted"><i class="fas fa-file-contract fa-3x mb-3 opacity-25"></i><p>No policies created yet.</p></div></div>
+{% endfor %}
+</div>
+{% endblock %}

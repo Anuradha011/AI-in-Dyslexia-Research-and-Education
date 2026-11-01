@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% block title %}Request Child Link{% endblock %}
+{% block page_title %}Request Student Access{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-lg-6">
+
+<div class="card" style="border-top:4px solid #6c63ff;">
+    <div class="card-body p-4">
+
+        <!-- Icon Header -->
+        <div class="text-center mb-4">
+            <div style="width:70px;height:70px;background:linear-gradient(135deg,#6c63ff,#a29bfe);
+                        border-radius:50%;display:flex;align-items:center;justify-content:center;
+                        margin:0 auto 14px;">
+                <i class="fas fa-user-plus fa-2x text-white"></i>
+            </div>
+            <h5 class="fw-bold mb-1">Request to Link Your Child</h5>
+            <p class="text-muted small mb-0">
+                Select your child's student account below. An admin will review
+                and approve your request before you can view their data.
+            </p>
+        </div>
+
+        <!-- Info Alert -->
+        <div class="alert alert-info mb-4" style="border-radius:12px;">
+            <i class="fas fa-info-circle me-2"></i>
+            <strong>Important Rules:</strong>
+            <ul class="mb-0 mt-1 small ps-3">
+                <li>Each parent can only be linked to <strong>one student</strong></li>
+                <li>Admin must <strong>approve</strong> your request before access is granted</li>
+                <li>You will see your child's assessments, learning plans, and reports</li>
+                <li>Access can be revoked by the admin at any time</li>
+            </ul>
+        </div>
+
+        {% if messages %}
+        {% for msg in messages %}
+        <div class="alert alert-{{ msg.tags }} alert-dismissible fade show">
+            {{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            <!-- Student Select -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">
+                    Select Your Child (Student Account)
+                    <span class="text-danger">*</span>
+                </label>
+                <select name="student_id" class="form-select form-select-lg" required>
+                    <option value="">-- Select student --</option>
+                    {% for student in students %}
+                    <option value="{{ student.pk }}">
+                        {{ student.get_full_name|default:student.username }}
+                        {% if student.student_profile.grade_level %}
+                            — Grade {{ student.student_profile.grade_level }}
+                        {% endif %}
+                        {% if student.institution %}
+                            ({{ student.institution }})
+                        {% endif %}
+                    </option>
+                    {% endfor %}
+                </select>
+                <small class="text-muted">
+                    If your child's account is not listed, ask them to register first.
+                </small>
+            </div>
+
+            <!-- Reason -->
+            <div class="mb-4">
+                <label class="form-label fw-bold">
+                    Reason / Relationship
+                    <span class="text-muted fw-normal">(optional but recommended)</span>
+                </label>
+                <textarea name="reason" class="form-control" rows="3"
+                          placeholder="e.g. This is my child. I am their parent/guardian and would like to monitor their learning progress."></textarea>
+                <small class="text-muted">
+                    This helps the admin verify your relationship with the student.
+                </small>
+            </div>
+
+            <!-- Buttons -->
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary flex-grow-1 py-2 fw-bold">
+                    <i class="fas fa-paper-plane me-2"></i>Submit Request
+                </button>
+                <a href="{% url 'accounts:parent_dashboard' %}"
+                   class="btn btn-outline-secondary px-4">
+                    Cancel
+                </a>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<!-- What Happens Next -->
+<div class="card mt-3">
+    <div class="card-header fw-bold small">
+        <i class="fas fa-question-circle me-2" style="color:#6c63ff;"></i>
+        What happens after you submit?
+    </div>
+    <div class="card-body p-3">
+        <div class="d-flex align-items-start gap-3 mb-3">
+            <div style="width:32px;height:32px;background:linear-gradient(135deg,#6c63ff,#a29bfe);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <span class="text-white fw-bold small">1</span>
+            </div>
+            <div>
+                <div class="fw-bold small">Request Submitted</div>
+                <div class="text-muted" style="font-size:0.8rem;">Your request goes to the admin for review</div>
+            </div>
+        </div>
+        <div class="d-flex align-items-start gap-3 mb-3">
+            <div style="width:32px;height:32px;background:linear-gradient(135deg,#fdcb6e,#e17055);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <span class="text-white fw-bold small">2</span>
+            </div>
+            <div>
+                <div class="fw-bold small">Admin Reviews</div>
+                <div class="text-muted" style="font-size:0.8rem;">Admin verifies your request and approves or rejects it</div>
+            </div>
+        </div>
+        <div class="d-flex align-items-start gap-3">
+            <div style="width:32px;height:32px;background:linear-gradient(135deg,#00b894,#55efc4);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <span class="text-white fw-bold small">3</span>
+            </div>
+            <div>
+                <div class="fw-bold small">Access Granted</div>
+                <div class="text-muted" style="font-size:0.8rem;">Once approved, you can see your child's full progress</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+</div>
+{% endblock %}

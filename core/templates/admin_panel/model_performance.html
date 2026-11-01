@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %}Model Performance{% endblock %}
+{% block page_title %}AI Model Performance Monitor{% endblock %}
+{% block content %}
+<div class="row g-4 mb-4">
+    <div class="col-md-3"><div class="stat-card bg-purple"><div class="d-flex justify-content-between"><div><div class="stat-value">{{ total_assessments }}</div><div class="stat-label">Total Processed</div></div><i class="fas fa-database stat-icon"></i></div></div></div>
+    <div class="col-md-3"><div class="stat-card bg-red"><div class="d-flex justify-content-between"><div><div class="stat-value">{{ high }}</div><div class="stat-label">High Risk Detected</div></div><i class="fas fa-exclamation-triangle stat-icon"></i></div></div></div>
+    <div class="col-md-3"><div class="stat-card bg-orange"><div class="d-flex justify-content-between"><div><div class="stat-value">{{ moderate }}</div><div class="stat-label">Moderate Risk</div></div><i class="fas fa-minus-circle stat-icon"></i></div></div></div>
+    <div class="col-md-3"><div class="stat-card bg-teal"><div class="d-flex justify-content-between"><div><div class="stat-value">{{ low }}</div><div class="stat-label">Low Risk</div></div><i class="fas fa-check-circle stat-icon"></i></div></div></div>
+</div>
+<div class="card mb-4">
+    <div class="card-header"><i class="fas fa-chart-bar me-2" style="color:#6c63ff;"></i>Risk Distribution</div>
+    <div class="card-body"><canvas id="perfChart" height="80"></canvas></div>
+</div>
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-robot me-2"></i>Uploaded Models & Metrics</span>
+        <a href="{% url 'admin_panel:upload_model' %}" class="btn btn-sm btn-primary">Upload New</a>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead><tr><th class="ps-3">Model</th><th>Accuracy</th><th>Precision</th><th>Recall</th><th>F1</th><th>Status</th></tr></thead>
+            <tbody>
+            {% for m in models_list %}
+            <tr>
+                <td class="ps-3"><div class="fw-bold">{{ m.model_name }}</div><div class="text-muted small">v{{ m.version }} · {{ m.get_model_type_display }}</div></td>
+                <td>{% if m.accuracy %}<span style="color:#6c63ff;font-weight:700;">{{ m.accuracy|floatformat:1 }}%</span>{% else %}—{% endif %}</td>
+                <td>{{ m.precision|floatformat:1 }}{% if m.precision %}%{% endif %}</td>
+                <td>{{ m.recall|floatformat:1 }}{% if m.recall %}%{% endif %}</td>
+                <td>{{ m.f1_score|floatformat:1 }}{% if m.f1_score %}%{% endif %}</td>
+                <td>{% if m.is_active %}<span class="badge bg-success">Active</span>{% else %}<span class="badge bg-secondary">Inactive</span>{% endif %}</td>
+            </tr>
+            {% empty %}<tr><td colspan="6" class="text-center py-4 text-muted">No models uploaded.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+new Chart(document.getElementById('perfChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+        labels: ['High Risk', 'Moderate Risk', 'Low Risk'],
+        datasets: [{
+            label: 'Students Assessed',
+            data: [{{ high }}, {{ moderate }}, {{ low }}],
+            backgroundColor: ['#d63031', '#fdcb6e', '#00b894'],
+            borderRadius: 10, borderWidth: 0,
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true }, x: { grid: { display: false } } }
+    }
+});
+</script>
+{% endblock %}

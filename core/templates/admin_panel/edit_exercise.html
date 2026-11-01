@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Edit Exercise{% endblock %}
+{% block page_title %}Edit Exercise{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-lg-7">
+<div class="card"><div class="card-header"><i class="fas fa-edit me-2"></i>Edit: {{ exercise.title }}</div>
+<div class="card-body p-4">
+    <form method="post">{% csrf_token %}
+        <div class="mb-3"><label class="form-label">Title</label><input type="text" name="title" class="form-control" value="{{ exercise.title }}" required></div>
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Type</label>
+                <select name="exercise_type" class="form-select">
+                    <option value="phonics" {% if exercise.exercise_type == 'phonics' %}selected{% endif %}>Phonics</option>
+                    <option value="reading" {% if exercise.exercise_type == 'reading' %}selected{% endif %}>Reading</option>
+                    <option value="spelling" {% if exercise.exercise_type == 'spelling' %}selected{% endif %}>Spelling</option>
+                    <option value="matching" {% if exercise.exercise_type == 'matching' %}selected{% endif %}>Word Matching</option>
+                    <option value="fill_blank" {% if exercise.exercise_type == 'fill_blank' %}selected{% endif %}>Fill in the Blank</option>
+                </select>
+            </div>
+            <div class="col-md-6"><label class="form-label">Difficulty (1-5)</label><input type="number" name="difficulty" class="form-control" min="1" max="5" value="{{ exercise.difficulty }}"></div>
+        </div>
+        <div class="mb-3"><label class="form-label">Content</label><textarea name="content" class="form-control" rows="4">{{ exercise.content }}</textarea></div>
+        <div class="mb-3"><label class="form-label">Correct Answer</label><input type="text" name="answer" class="form-control" value="{{ exercise.answer }}"></div>
+        <div class="mb-3"><label class="form-label">Hint</label><input type="text" name="hint" class="form-control" value="{{ exercise.hint }}"></div>
+        <div class="mb-4 form-check form-switch"><input class="form-check-input" type="checkbox" name="is_active" id="is_active" {% if exercise.is_active %}checked{% endif %}><label class="form-check-label" for="is_active">Active</label></div>
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary flex-grow-1">Update Exercise</button>
+            <a href="{% url 'admin_panel:content_management' %}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </form>
+</div></div>
+</div></div>
+{% endblock %}

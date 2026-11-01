@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Report Detail{% endblock %}
+{% block page_title %}Progress Report{% endblock %}
+{% block content %}
+<div class="row g-4">
+<div class="col-lg-8">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between"><span><i class="fas fa-file-alt me-2" style="color:#6c63ff;"></i>{{ report.title }}</span>{% if report.risk_level %}<span class="badge risk-{{ report.risk_level }}">{{ report.risk_level|title }} Risk</span>{% endif %}</div>
+        <div class="card-body">
+            <div class="p-3 mb-3" style="background:#f8f4ff;border-radius:12px;"><strong>Summary:</strong><p class="mb-0 mt-1">{{ report.summary }}</p></div>
+            {% if report.strengths %}<div class="p-3 mb-3" style="background:#e0f7ef;border-radius:12px;border-left:4px solid #00b894;"><strong class="text-success"><i class="fas fa-star me-1"></i>Strengths:</strong><p class="mb-0 mt-1 small">{{ report.strengths }}</p></div>{% endif %}
+            {% if report.areas_for_improvement %}<div class="p-3 mb-3" style="background:#fef9e7;border-radius:12px;border-left:4px solid #fdcb6e;"><strong style="color:#e17055;"><i class="fas fa-tools me-1"></i>Areas for Improvement:</strong><p class="mb-0 mt-1 small">{{ report.areas_for_improvement }}</p></div>{% endif %}
+            {% if report.ai_explanation %}<div class="p-3" style="background:#ede9ff;border-radius:12px;border-left:4px solid #6c63ff;"><strong style="color:#6c63ff;"><i class="fas fa-robot me-1"></i>AI Explanation:</strong><p class="mb-0 mt-1 small">{{ report.ai_explanation }}</p></div>{% endif %}
+        </div>
+    </div>
+</div>
+<div class="col-lg-4">
+    <div class="card mb-3">
+        <div class="card-body">
+            <p><strong>Student:</strong><br><span class="role-tag role-student">{{ report.student.username }}</span></p>
+            <p><strong>Overall Score:</strong><br><span style="font-size:1.8rem;font-weight:800;color:#6c63ff;">{{ report.overall_score|floatformat:1 }}%</span></p>
+            <p><strong>Generated:</strong><br>{{ report.generated_at|date:"M d, Y H:i" }}</p>
+            <p class="mb-0"><strong>By:</strong><br>{{ report.generated_by }}</p>
+        </div>
+    </div>
+    <div class="card"><div class="card-body d-grid gap-2"><a href="{% url 'reports:list' %}" class="btn btn-outline-secondary">← All Reports</a></div></div>
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Create Learning Plan{% endblock %}
+{% block page_title %}Create Learning Plan{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-lg-7">
+<div class="card"><div class="card-header"><i class="fas fa-plus me-2"></i>New Plan for {{ student.get_full_name|default:student.username }}</div>
+<div class="card-body p-4">
+    <form method="post">{% csrf_token %}
+        <div class="mb-3"><label class="form-label">Plan Title</label><input type="text" name="title" class="form-control" value="Personalized Learning Plan" required></div>
+        <div class="mb-4"><label class="form-label">Description</label><textarea name="description" class="form-control" rows="3" placeholder="Describe the plan goals..."></textarea></div>
+        <div class="alert alert-info"><i class="fas fa-magic me-2"></i>5 learning modules will be auto-generated based on the student's assessment results.</div>
+        <button type="submit" class="btn btn-primary">Create Plan</button>
+        <a href="{% url 'learning:home' %}" class="btn btn-outline-secondary ms-2">Cancel</a>
+    </form>
+</div></div>
+</div></div>
+{% endblock %}

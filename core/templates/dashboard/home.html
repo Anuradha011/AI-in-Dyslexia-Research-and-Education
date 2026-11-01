@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block auth_content %}
+<div style="min-height:100vh;background:linear-gradient(135deg,#6c63ff 0%,#a29bfe 50%,#fd79a8 100%);display:flex;align-items:center;justify-content:center;padding:40px 20px;">
+    <div class="text-center" style="max-width:520px;">
+
+        <div style="width:80px;height:80px;background:rgba(255,255,255,0.25);border-radius:24px;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;backdrop-filter:blur(10px);">
+            <i class="fas fa-brain fa-2x text-white"></i>
+        </div>
+
+        <h1 style="color:#fff;font-weight:800;font-size:2.5rem;margin-bottom:12px;">DyslexiaCare</h1>
+        <p style="color:rgba(255,255,255,0.8);font-size:1.1rem;margin-bottom:40px;">
+            AI-Powered Dyslexia Detection &amp; Personalized Learning Platform
+        </p>
+
+        <div class="d-flex gap-3 justify-content-center flex-wrap mb-5">
+            <a href="{% url 'accounts:login' %}" class="btn btn-light px-5 py-3 fw-bold" style="border-radius:16px;font-size:1rem;">
+                <i class="fas fa-sign-in-alt me-2"></i>Sign In
+            </a>
+            <a href="{% url 'accounts:register' %}" class="btn px-5 py-3 fw-bold" style="background:rgba(255,255,255,0.2);border:2px solid rgba(255,255,255,0.5);color:#fff;border-radius:16px;font-size:1rem;">
+                <i class="fas fa-user-plus me-2"></i>Register
+            </a>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-4">
+                <div style="background:rgba(255,255,255,0.15);border-radius:16px;padding:16px;backdrop-filter:blur(10px);">
+                    <i class="fas fa-clipboard-check fa-2x text-white mb-2"></i>
+                    <p class="text-white small fw-bold mb-0">Assessment</p>
+                </div>
+            </div>
+            <div class="col-4">
+                <div style="background:rgba(255,255,255,0.15);border-radius:16px;padding:16px;backdrop-filter:blur(10px);">
+                    <i class="fas fa-book-open fa-2x text-white mb-2"></i>
+                    <p class="text-white small fw-bold mb-0">Learning</p>
+                </div>
+            </div>
+            <div class="col-4">
+                <div style="background:rgba(255,255,255,0.15);border-radius:16px;padding:16px;backdrop-filter:blur(10px);">
+                    <i class="fas fa-brain fa-2x text-white mb-2"></i>
+                    <p class="text-white small fw-bold mb-0">AI Analysis</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

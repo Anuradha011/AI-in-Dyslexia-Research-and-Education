@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}{{ exercise.title }}{% endblock %}
+{% block page_title %}Exercise{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-lg-7">
+<div class="card">
+    <div class="card-header"><i class="fas fa-pen-nib me-2" style="color:#6c63ff;"></i>{{ exercise.title }}</div>
+    <div class="card-body p-4">
+        <span class="badge bg-light text-dark border mb-3">{{ exercise.get_exercise_type_display }}</span>
+        <div class="p-4 mb-4" style="background:#f8f4ff;border-radius:14px;font-size:1.05rem;font-weight:500;border-left:4px solid #6c63ff;">{{ exercise.content }}</div>
+        {% if exercise.hint %}<div class="alert alert-light border"><i class="fas fa-lightbulb text-warning me-2"></i><strong>Hint:</strong> {{ exercise.hint }}</div>{% endif %}
+        {% if result %}
+        <div class="alert {% if result == 'correct' %}alert-success{% else %}alert-danger{% endif %} mb-3">
+            {% if result == 'correct' %}<i class="fas fa-check-circle me-2"></i>Correct! Well done!{% else %}<i class="fas fa-times-circle me-2"></i>Incorrect. The correct answer is: <strong>{{ exercise.answer }}</strong>{% endif %}
+        </div>
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            <label class="form-label">Your Answer</label>
+            <input type="text" name="answer" class="form-control form-control-lg mb-3" placeholder="Type your answer...">
+            <button type="submit" class="btn btn-primary w-100 py-2">Submit Answer</button>
+        </form>
+    </div>
+</div>
+</div></div>
+{% endblock %}

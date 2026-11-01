@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Upload AI Model{% endblock %}
+{% block page_title %}Upload AI Model{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-lg-7">
+<div class="card">
+    <div class="card-header"><i class="fas fa-upload me-2" style="color:#6c63ff;"></i>Upload New AI Model</div>
+    <div class="card-body p-4">
+        <div class="alert alert-info small mb-4">
+            <i class="fas fa-info-circle me-2"></i>
+            Upload a trained <code>.joblib</code> or <code>.pkl</code> model file. Generate it using <code>python train_model.py</code> from your project root.
+        </div>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-12"><label class="form-label">Model Name *</label><input type="text" name="model_name" class="form-control" placeholder="e.g. Dyslexia RF Classifier v2" required></div>
+                <div class="col-md-6">
+                    <label class="form-label">Model Type *</label>
+                    <select name="model_type" class="form-select" required>
+                        <option value="risk_classifier">Dyslexia Risk Classifier</option>
+                        <option value="phonological">Phonological Analyzer</option>
+                        <option value="reading_speed">Reading Speed Model</option>
+                        <option value="nlp_grammar">NLP Grammar Checker</option>
+                    </select>
+                </div>
+                <div class="col-md-6"><label class="form-label">Version</label><input type="text" name="version" class="form-control" placeholder="e.g. 1.0" value="1.0"></div>
+                <div class="col-md-6"><label class="form-label">Accuracy (%)</label><input type="number" name="accuracy" class="form-control" min="0" max="100" step="0.01" placeholder="e.g. 94.5"></div>
+                <div class="col-md-6"><label class="form-label">F1 Score (%)</label><input type="number" name="f1_score" class="form-control" min="0" max="100" step="0.01" placeholder="e.g. 93.1"></div>
+                <div class="col-12"><label class="form-label">Model File (.joblib or .pkl) *</label><input type="file" name="model_file" class="form-control" accept=".joblib,.pkl" required></div>
+                <div class="col-12"><label class="form-label">Notes</label><textarea name="notes" class="form-control" rows="3" placeholder="Describe training data, changes, etc."></textarea></div>
+            </div>
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-primary flex-grow-1"><i class="fas fa-upload me-2"></i>Upload Model</button>
+                <a href="{% url 'admin_panel:model_management' %}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+</div></div>
+{% endblock %}

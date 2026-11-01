@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Language Management{% endblock %}
+{% block page_title %}Multi-Language Management{% endblock %}
+{% block content %}
+<div class="row g-4">
+<div class="col-lg-5">
+    <div class="card">
+        <div class="card-header"><i class="fas fa-globe me-2" style="color:#6c63ff;"></i>Add / Update Language</div>
+        <div class="card-body p-4">
+            <form method="post">{% csrf_token %}
+                <div class="mb-3"><label class="form-label">Language Code *</label><input type="text" name="code" class="form-control" placeholder="e.g. en, es, fr, hi" required maxlength="10"></div>
+                <div class="mb-3"><label class="form-label">Language Name *</label><input type="text" name="name" class="form-control" placeholder="e.g. English" required></div>
+                <div class="mb-3"><label class="form-label">Native Name</label><input type="text" name="native_name" class="form-control" placeholder="e.g. English, Español, हिन्दी"></div>
+                <div class="mb-2 form-check form-switch"><input class="form-check-input" type="checkbox" name="is_active" id="la1" checked><label class="form-check-label" for="la1">Active on Platform</label></div>
+                <div class="mb-2 form-check form-switch"><input class="form-check-input" type="checkbox" name="content_available" id="la2"><label class="form-check-label" for="la2">Learning Content Available</label></div>
+                <div class="mb-2 form-check form-switch"><input class="form-check-input" type="checkbox" name="tts_available" id="la3"><label class="form-check-label" for="la3">Text-to-Speech Available</label></div>
+                <div class="mb-4 form-check form-switch"><input class="form-check-input" type="checkbox" name="stt_available" id="la4"><label class="form-check-label" for="la4">Speech-to-Text Available</label></div>
+                <button type="submit" class="btn btn-primary w-100">Save Language</button>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="col-lg-7">
+    <div class="card">
+        <div class="card-header"><i class="fas fa-list me-2"></i>Supported Languages ({{ languages.count }})</div>
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead><tr><th class="ps-3">Language</th><th>Content</th><th>TTS</th><th>STT</th><th>Status</th></tr></thead>
+                <tbody>
+                {% for lang in languages %}
+                <tr>
+                    <td class="ps-3">
+                        <div class="fw-bold">{{ lang.name }}</div>
+                        <div class="text-muted small">{{ lang.native_name }} · <span class="font-monospace">{{ lang.code }}</span></div>
+                    </td>
+                    <td>{% if lang.content_available %}<i class="fas fa-check-circle text-success"></i>{% else %}<i class="fas fa-times-circle text-secondary opacity-50"></i>{% endif %}</td>
+                    <td>{% if lang.tts_available %}<i class="fas fa-check-circle text-success"></i>{% else %}<i class="fas fa-times-circle text-secondary opacity-50"></i>{% endif %}</td>
+                    <td>{% if lang.stt_available %}<i class="fas fa-check-circle text-success"></i>{% else %}<i class="fas fa-times-circle text-secondary opacity-50"></i>{% endif %}</td>
+                    <td>{% if lang.is_active %}<span class="badge bg-success">Active</span>{% else %}<span class="badge bg-secondary">Inactive</span>{% endif %}</td>
+                </tr>
+                {% empty %}<tr><td colspan="5" class="text-center py-4 text-muted">No languages added yet.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

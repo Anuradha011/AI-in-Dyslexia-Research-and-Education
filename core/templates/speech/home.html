@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+{% block title %}Speech Tools{% endblock %}
+{% block page_title %}Speech & Language Tools{% endblock %}
+
+{% block content %}
+
+<!-- Tool Cards -->
+<div class="row g-4 mb-4">
+
+    <!-- Start Session -->
+    <div class="col-md-4">
+        <div class="card text-center h-100" style="border-top:4px solid #6c63ff;">
+            <div class="card-body p-4">
+                <div style="width:70px;height:70px;background:linear-gradient(135deg,#6c63ff,#a29bfe);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+                    <i class="fas fa-microphone fa-2x text-white"></i>
+                </div>
+                <h5 class="fw-bold">Speech Practice</h5>
+                <p class="text-muted small mb-4">
+                    Read a passage aloud. The AI listens, transcribes your speech in real time,
+                    and gives you a detailed report on fluency, pronunciation, and accuracy.
+                </p>
+                <a href="{% url 'speech:session' %}" class="btn btn-primary px-4 py-2 fw-bold w-100">
+                    <i class="fas fa-play-circle me-2"></i>Start Session
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Text to Speech -->
+    <div class="col-md-4">
+        <div class="card text-center h-100" style="border-top:4px solid #00b894;">
+            <div class="card-body p-4">
+                <div style="width:70px;height:70px;background:linear-gradient(135deg,#00b894,#55efc4);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+                    <i class="fas fa-volume-up fa-2x text-white"></i>
+                </div>
+                <h5 class="fw-bold">Text to Speech</h5>
+                <p class="text-muted small mb-4">
+                    Type or paste any text and the system will read it aloud for you.
+                    Helpful for understanding difficult words and practising listening skills.
+                </p>
+                <a href="{% url 'speech:tts' %}" class="btn fw-bold px-4 py-2 w-100"
+                   style="background:linear-gradient(135deg,#00b894,#55efc4);color:#fff;border:none;">
+                    <i class="fas fa-volume-up me-2"></i>Open TTS Tool
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Session History -->
+    <div class="col-md-4">
+        <div class="card text-center h-100" style="border-top:4px solid #fd79a8;">
+            <div class="card-body p-4">
+                <div style="width:70px;height:70px;background:linear-gradient(135deg,#fd79a8,#e84393);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+                    <i class="fas fa-history fa-2x text-white"></i>
+                </div>
+                <h5 class="fw-bold">Session History</h5>
+                <p class="text-muted small mb-4">
+                    Review all your past speech sessions. Track your fluency, pronunciation,
+                    and accuracy scores over time to see your improvement.
+                </p>
+                <a href="{% url 'speech:sessions' %}" class="btn fw-bold px-4 py-2 w-100"
+                   style="background:linear-gradient(135deg,#fd79a8,#e84393);color:#fff;border:none;">
+                    <i class="fas fa-history me-2"></i>View History
+                </a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Recent Sessions -->
+{% if sessions %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-clock me-2" style="color:#6c63ff;"></i><strong>Recent Sessions</strong></span>
+        <a href="{% url 'speech:sessions' %}" class="btn btn-sm btn-outline-primary">View All</a>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th class="ps-3">Date</th>
+                    <th>Type</th>
+                    <th>Fluency</th>
+                    <th>Pronunciation</th>
+                    <th>Accuracy</th>
+                    <th>WPM</th>
+                    <th>Grade</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for s in sessions %}
+            <tr>
+                <td class="ps-3 text-muted small">{{ s.created_at|date:"M d, Y" }}</td>
+                <td><span class="badge bg-light text-dark border">{{ s.get_session_type_display }}</span></td>
+                <td>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="progress flex-grow-1" style="height:6px;min-width:50px;">
+                            <div class="progress-bar" style="background:#6c63ff;width:{{ s.fluency_score }}%;"></div>
+                        </div>
+                        <span class="small fw-bold" style="color:#6c63ff;">{{ s.fluency_score|floatformat:0 }}%</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="progress flex-grow-1" style="height:6px;min-width:50px;">
+                            <div class="progress-bar bg-success" style="width:{{ s.pronunciation_score }}%;"></div>
+                        </div>
+                        <span class="small fw-bold text-success">{{ s.pronunciation_score|floatformat:0 }}%</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="progress flex-grow-1" style="height:6px;min-width:50px;">
+                            <div class="progress-bar" style="background:#e84393;width:{{ s.accuracy_score }}%;"></div>
+                        </div>
+                        <span class="small fw-bold" style="color:#e84393;">{{ s.accuracy_score|floatformat:0 }}%</span>
+                    </div>
+                </td>
+                <td class="fw-bold" style="color:#e17055;">{{ s.reading_speed_wpm|floatformat:0 }}</td>
+                <td>
+                    <span class="badge px-3 py-1 fw-bold"
+                          style="background:{% if s.get_grade == 'A' %}#00b894{% elif s.get_grade == 'B' %}#6c63ff{% elif s.get_grade == 'C' %}#fdcb6e{% else %}#d63031{% endif %};color:#fff;">
+                        {{ s.get_grade }}
+                    </span>
+                </td>
+                <td>
+                    <a href="{% url 'speech:session_detail' s.pk %}" class="btn btn-sm btn-outline-primary">
+                        View
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<!-- No sessions yet -->
+<div class="card">
+    <div class="card-body text-center py-5">
+        <div style="width:80px;height:80px;background:linear-gradient(135deg,#6c63ff,#a29bfe);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+            <i class="fas fa-microphone fa-2x text-white"></i>
+        </div>
+        <h5 class="fw-bold mb-2">No Speech Sessions Yet</h5>
+        <p class="text-muted mb-4">
+            Start your first speech practice session to see your fluency,
+            pronunciation, and accuracy scores here.
+        </p>
+        <a href="{% url 'speech:session' %}" class="btn btn-primary px-5 py-2 fw-bold">
+            <i class="fas fa-microphone me-2"></i>Start First Session
+        </a>
+    </div>
+</div>
+{% endif %}
+
+<!-- How It Works -->
+<div class="card mt-4">
+    <div class="card-header fw-bold">
+        <i class="fas fa-info-circle me-2" style="color:#6c63ff;"></i>How Speech Practice Works
+    </div>
+    <div class="card-body">
+        <div class="row g-3 text-center">
+            <div class="col-md-3">
+                <div style="width:44px;height:44px;background:linear-gradient(135deg,#6c63ff,#a29bfe);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
+                    <span class="text-white fw-bold">1</span>
+                </div>
+                <div class="fw-bold small">Read the Passage</div>
+                <div class="text-muted" style="font-size:0.75rem;">A reading passage is shown to you</div>
+            </div>
+            <div class="col-md-3">
+                <div style="width:44px;height:44px;background:linear-gradient(135deg,#00b894,#55efc4);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
+                    <span class="text-white fw-bold">2</span>
+                </div>
+                <div class="fw-bold small">Click & Speak</div>
+                <div class="text-muted" style="font-size:0.75rem;">Click the mic and read aloud</div>
+            </div>
+            <div class="col-md-3">
+                <div style="width:44px;height:44px;background:linear-gradient(135deg,#fd79a8,#e84393);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
+                    <span class="text-white fw-bold">3</span>
+                </div>
+                <div class="fw-bold small">AI Listens</div>
+                <div class="text-muted" style="font-size:0.75rem;">Words appear in real time</div>
+            </div>
+            <div class="col-md-3">
+                <div style="width:44px;height:44px;background:linear-gradient(135deg,#e17055,#fdcb6e);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
+                    <span class="text-white fw-bold">4</span>
+                </div>
+                <div class="fw-bold small">Get Your Report</div>
+                <div class="text-muted" style="font-size:0.75rem;">Full scores and feedback</div>
+            </div>
+        </div>
+        <div class="alert alert-light border mt-3 mb-0 small">
+            <i class="fas fa-chrome me-2 text-primary"></i>
+            <strong>Browser requirement:</strong> Speech recognition works best in
+            <strong>Google Chrome</strong> or <strong>Microsoft Edge</strong>.
+            It does not work in Firefox or Safari.
+        </div>
+    </div>
+</div>
+
+{% endblock %}

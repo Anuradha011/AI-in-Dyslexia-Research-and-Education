@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Speech Sessions{% endblock %}
+{% block page_title %}Speech Session History{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead><tr><th class="ps-3">Type</th><th>Fluency</th><th>Pronunciation</th><th>Grammar</th><th>Duration</th><th>Date</th><th>Action</th></tr></thead>
+            <tbody>
+            {% for s in sessions %}
+            <tr>
+                <td class="ps-3"><span class="badge bg-light text-dark border">{{ s.get_session_type_display }}</span></td>
+                <td><span class="fw-bold" style="color:#6c63ff;">{{ s.fluency_score|default:"—"|floatformat:0 }}{% if s.fluency_score %}%{% endif %}</span></td>
+                <td>{{ s.pronunciation_score|default:"—"|floatformat:0 }}{% if s.pronunciation_score %}%{% endif %}</td>
+                <td>{{ s.grammar_score|default:"—"|floatformat:0 }}{% if s.grammar_score %}%{% endif %}</td>
+                <td class="text-muted">{{ s.duration_seconds|floatformat:0 }}s</td>
+                <td class="text-muted small">{{ s.created_at|date:"M d, Y" }}</td>
+                <td><a href="{% url 'speech:session_detail' s.pk %}" class="btn btn-sm btn-outline-primary">View</a></td>
+            </tr>
+            {% empty %}<tr><td colspan="7" class="text-center py-4 text-muted">No sessions yet. <a href="{% url 'speech:start_session' %}">Start one!</a></td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Assessment Detail{% endblock %}
+{% block page_title %}Assessment Detail{% endblock %}
+{% block content %}
+<div class="row g-4">
+<div class="col-lg-8">
+    <div class="card">
+        <div class="card-header"><i class="fas fa-clipboard-check me-2"></i>{{ assessment.title }}</div>
+        <div class="card-body">
+            <div class="row g-3 mb-3">
+                <div class="col-md-4"><strong>Student:</strong><br><span class="role-tag role-student mt-1 d-inline-block">{{ assessment.student.username }}</span></div>
+                <div class="col-md-4"><strong>Status:</strong><br><span class="badge {% if assessment.status == 'completed' %}bg-success{% else %}bg-secondary{% endif %} mt-1">{{ assessment.get_status_display }}</span></div>
+                <div class="col-md-4"><strong>Risk:</strong><br>{% if assessment.risk_level %}<span class="badge risk-{{ assessment.risk_level }} mt-1">{{ assessment.get_risk_level_display }}</span>{% else %}—{% endif %}</div>
+            </div>
+            {% if assessment.ai_analysis %}<div class="p-3 mb-3" style="background:#f8f4ff;border-radius:12px;"><strong>AI Analysis:</strong><p class="mb-0 mt-1 small">{{ assessment.ai_analysis }}</p></div>{% endif %}
+            {% if responses %}
+            <h6 class="fw-bold mt-3">Response Details</h6>
+            <table class="table table-sm">
+                <thead><tr><th>Question</th><th>Type</th><th>Answer</th><th>Correct?</th></tr></thead>
+                <tbody>
+                {% for r in responses %}
+                <tr>
+                    <td>{{ r.question.question_text|truncatechars:40 }}</td>
+                    <td><span class="badge bg-light text-dark">{{ r.question.get_question_type_display }}</span></td>
+                    <td>{{ r.student_answer }}</td>
+                    <td>{% if r.is_correct %}<i class="fas fa-check text-success"></i>{% else %}<i class="fas fa-times text-danger"></i>{% endif %}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<div class="col-lg-4">
+    <div class="card"><div class="card-body d-grid gap-2">
+        {% if assessment.status == 'completed' %}<a href="{% url 'assessment:results' assessment.pk %}" class="btn btn-primary">View Results</a>{% endif %}
+        <a href="{% url 'assessment:list' %}" class="btn btn-outline-secondary">← Back</a>
+    </div></div>
+</div>
+</div>
+{% endblock %}

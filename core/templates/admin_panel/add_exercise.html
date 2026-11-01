@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Add Exercise{% endblock %}
+{% block page_title %}Add Learning Exercise{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-lg-7">
+<div class="card"><div class="card-header"><i class="fas fa-plus me-2"></i>New Exercise</div>
+<div class="card-body p-4">
+    <form method="post">{% csrf_token %}
+        <div class="mb-3"><label class="form-label">Title *</label><input type="text" name="title" class="form-control" required></div>
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Type *</label>
+                <select name="exercise_type" class="form-select" required>
+                    <option value="phonics">Phonics</option><option value="reading">Reading</option>
+                    <option value="spelling">Spelling</option><option value="matching">Word Matching</option>
+                    <option value="fill_blank">Fill in the Blank</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Difficulty (1-5)</label>
+                <input type="number" name="difficulty" class="form-control" min="1" max="5" value="1">
+            </div>
+        </div>
+        <div class="mb-3"><label class="form-label">Exercise Content / Question *</label><textarea name="content" class="form-control" rows="4" required placeholder="Write the question or task here..."></textarea></div>
+        <div class="mb-3"><label class="form-label">Correct Answer *</label><input type="text" name="answer" class="form-control" required placeholder="The exact expected answer"></div>
+        <div class="mb-4"><label class="form-label">Hint (optional)</label><input type="text" name="hint" class="form-control" placeholder="Give a helpful clue..."></div>
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary flex-grow-1">Save Exercise</button>
+            <a href="{% url 'admin_panel:content_management' %}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </form>
+</div></div>
+</div></div>
+{% endblock %}

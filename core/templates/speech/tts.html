@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Text to Speech{% endblock %}
+{% block page_title %}Text to Speech{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-lg-7">
+<div class="card">
+    <div class="card-header"><i class="fas fa-volume-up me-2 text-success"></i>Text to Speech Converter</div>
+    <div class="card-body p-4">
+        {% if messages %}{% for msg in messages %}<div class="alert alert-danger">{{ msg }}</div>{% endfor %}{% endif %}
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-4"><label class="form-label">Enter text to convert to speech:</label><textarea name="text" class="form-control" rows="5" placeholder="Type or paste text here...">{{ input_text }}</textarea></div>
+            <button type="submit" class="btn btn-success w-100 py-2"><i class="fas fa-play me-2"></i>Generate Audio</button>
+        </form>
+        {% if audio_url %}
+        <div class="mt-4 p-3" style="background:#e0f7ef;border-radius:14px;">
+            <h6 class="fw-bold text-success mb-3"><i class="fas fa-check-circle me-2"></i>Audio Generated!</h6>
+            <audio controls class="w-100"><source src="{{ audio_url }}" type="audio/mpeg">Your browser does not support audio.</audio>
+        </div>
+        {% endif %}
+    </div>
+</div>
+</div></div>
+{% endblock %}

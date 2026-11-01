@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Reports{% endblock %}
+{% block page_title %}Progress Reports{% endblock %}
+{% block content %}
+<div class="row g-4">
+{% for report in reports %}
+<div class="col-lg-6">
+    <div class="card h-100">
+        <div class="card-body">
+            <div class="d-flex align-items-start gap-3">
+                <div style="width:48px;height:48px;background:linear-gradient(135deg,#6c63ff,#a29bfe);border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fas fa-file-alt text-white"></i></div>
+                <div class="flex-grow-1">
+                    <h6 class="fw-bold mb-1">{{ report.title|truncatechars:50 }}</h6>
+                    <div class="d-flex gap-2 flex-wrap mb-2">
+                        <span class="role-tag role-student">{{ report.student.username }}</span>
+                        {% if report.risk_level %}<span class="badge risk-{{ report.risk_level }}">{{ report.risk_level|title }} Risk</span>{% endif %}
+                    </div>
+                    <p class="text-muted small mb-0">{{ report.summary|truncatechars:100 }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
+            <span class="text-muted small">{{ report.generated_at|date:"M d, Y" }}</span>
+            <a href="{% url 'reports:detail' report.pk %}" class="btn btn-sm btn-outline-primary">View Report</a>
+        </div>
+    </div>
+</div>
+{% empty %}<div class="col-12"><div class="card p-5 text-center text-muted"><i class="fas fa-file fa-3x mb-3 opacity-25"></i><p>No reports yet.</p></div></div>
+{% endfor %}
+</div>
+{% endblock %}

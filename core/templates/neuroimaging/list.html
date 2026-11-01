@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Neuroimaging{% endblock %}
+{% block page_title %}Neuroimaging Data{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between mb-4">
+    <p class="text-muted">{{ uploads.count }} scan(s) on record</p>
+    {% if user.is_admin_user or user.role == 'educator' %}<a href="{% url 'neuroimaging:upload' %}" class="btn btn-primary"><i class="fas fa-upload me-2"></i>Upload Scan</a>{% endif %}
+</div>
+<div class="row g-4">
+{% for scan in uploads %}
+<div class="col-lg-4 col-md-6">
+    <div class="card h-100">
+        <div class="card-body">
+            <div class="d-flex align-items-center gap-3 mb-3">
+                <div style="width:48px;height:48px;background:linear-gradient(135deg,#6c63ff,#a29bfe);border-radius:14px;display:flex;align-items:center;justify-content:center;"><i class="fas fa-brain text-white"></i></div>
+                <div><div class="fw-bold">{{ scan.get_scan_type_display }}</div><div class="text-muted small">Patient: {{ scan.patient.username }}</div></div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="badge {% if scan.status == 'analyzed' %}bg-success{% elif scan.status == 'processing' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">{{ scan.get_status_display }}</span>
+                <span class="text-muted small">{{ scan.uploaded_at|date:"M d, Y" }}</span>
+            </div>
+        </div>
+        <div class="card-footer bg-transparent d-flex gap-2">
+            <a href="{% url 'neuroimaging:detail' scan.pk %}" class="btn btn-sm btn-outline-primary">Detail</a>
+            {% if scan.status != 'analyzed' and user.is_admin_user %}<a href="{% url 'neuroimaging:analyze' scan.pk %}" class="btn btn-sm btn-primary">Analyze</a>{% endif %}
+        </div>
+    </div>
+</div>
+{% empty %}<div class="col-12"><div class="card p-5 text-center text-muted"><i class="fas fa-brain fa-3x mb-3 opacity-25"></i><p>No scans uploaded yet.</p></div></div>
+{% endfor %}
+</div>
+{% endblock %}

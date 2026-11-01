@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Learning Plans{% endblock %}
+{% block page_title %}Learning Plans{% endblock %}
+{% block content %}
+<div class="row g-4">
+{% for plan in plans %}
+<div class="col-lg-4 col-md-6">
+    <div class="card h-100">
+        <div class="card-body">
+            <div style="width:48px;height:48px;background:linear-gradient(135deg,#6c63ff,#a29bfe);border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;"><i class="fas fa-book-open text-white"></i></div>
+            <h6 class="fw-bold">{{ plan.title }}</h6>
+            <p class="text-muted small">{{ plan.description|truncatechars:100 }}</p>
+            <div class="d-flex gap-2 flex-wrap mt-2">
+                {% for mod in plan.modules.all|slice:":3" %}
+                <span class="badge bg-light text-dark border">{{ mod.get_module_type_display }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
+            <span class="text-muted small">{{ plan.modules.count }} modules</span>
+            <a href="{% url 'learning:plan_detail' plan.pk %}" class="btn btn-sm btn-primary">Open Plan</a>
+        </div>
+    </div>
+</div>
+{% empty %}
+<div class="col-12"><div class="card p-5 text-center text-muted"><i class="fas fa-book fa-3x mb-3 opacity-25"></i><p>No learning plans yet.</p></div></div>
+{% endfor %}
+</div>
+{% endblock %}

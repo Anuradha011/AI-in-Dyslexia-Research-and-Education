@@ -1,0 +1,294 @@
+{% extends 'base.html' %}
+{% block title %}Parent Dashboard{% endblock %}
+{% block page_title %}Parent Dashboard{% endblock %}
+
+{% block content %}
+
+{% if messages %}
+{% for msg in messages %}
+<div class="alert alert-{{ msg.tags }} alert-dismissible fade show">
+    {{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{% endfor %}
+{% endif %}
+
+{% if approved_request and child_data %}
+
+<div class="alert alert-success d-flex align-items-center gap-2 mb-4" style="border-radius:12px;">
+    <i class="fas fa-check-circle fa-lg"></i>
+    <span>
+        You are linked to <strong>{{ approved_request.student.get_full_name|default:approved_request.student.username }}</strong>.
+        Approved by admin on {{ approved_request.reviewed_at|date:"M d, Y" }}.
+    </span>
+</div>
+
+<div class="card mb-4" style="background:linear-gradient(135deg,#6c63ff,#a29bfe);border:none;">
+    <div class="card-body p-4 text-white">
+        <div class="d-flex align-items-center gap-4">
+            <div style="width:72px;height:72px;background:rgba(255,255,255,0.25);
+                        border-radius:50%;display:flex;align-items:center;justify-content:center;
+                        font-size:1.8rem;font-weight:900;">
+                {{ child_data.child.username|first|upper }}
+            </div>
+            <div>
+                <h4 class="fw-bold mb-1">
+                    {{ child_data.child.get_full_name|default:child_data.child.username }}
+                </h4>
+                <div style="opacity:0.85;">
+                    <i class="fas fa-user-graduate me-1"></i>Student
+                    {% if child_data.child.institution %}
+                    &nbsp;·&nbsp; <i class="fas fa-school me-1"></i>{{ child_data.child.institution }}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="ms-auto text-end">
+                {% if child_data.latest_assessment %}
+                <div style="background:rgba(255,255,255,0.2);border-radius:14px;padding:12px 20px;">
+                    <div style="font-size:1.6rem;font-weight:900;">
+                        {{ child_data.latest_assessment.risk_score|floatformat:0 }}
+                    </div>
+                    <span class="badge risk-{{ child_data.latest_assessment.risk_level }} px-3 py-1">
+                        {{ child_data.latest_assessment.get_risk_level_display }}
+                    </span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="stat-card bg-purple">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <div class="stat-value">{{ child_data.assessment_count }}</div>
+                    <div class="stat-label">Assessments</div>
+                </div>
+                <i class="fas fa-clipboard-check stat-icon"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card bg-teal">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <div class="stat-value">{{ child_data.plans.count }}</div>
+                    <div class="stat-label">Active Plans</div>
+                </div>
+                <i class="fas fa-book-open stat-icon"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card bg-pink">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <div class="stat-value">{{ child_data.reports.count }}</div>
+                    <div class="stat-label">Reports</div>
+                </div>
+                <i class="fas fa-file-alt stat-icon"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card bg-orange">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <div class="stat-value">
+                        {% if child_data.latest_assessment %}
+                            {{ child_data.latest_assessment.risk_score|floatformat:0 }}
+                        {% else %}—{% endif %}
+                    </div>
+                    <div class="stat-label">Risk Score</div>
+                </div>
+                <i class="fas fa-brain stat-icon"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if child_data.latest_assessment %}
+<div class="card mb-4">
+    <div class="card-header fw-bold">
+        <i class="fas fa-clipboard-check me-2" style="color:#6c63ff;"></i>
+        Latest Assessment — {{ child_data.latest_assessment.title }}
+    </div>
+    <div class="card-body">
+        <div class="row g-3 text-center mb-3">
+            <div class="col-6 col-md-3">
+                <div style="background:#ede9ff;border-radius:12px;padding:14px;">
+                    <div style="font-size:1.6rem;font-weight:900;color:#6c63ff;">
+                        {{ child_data.latest_assessment.phonological_score|floatformat:0 }}%
+                    </div>
+                    <div class="text-muted small fw-bold">Phonological</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div style="background:#e0f7ef;border-radius:12px;padding:14px;">
+                    <div style="font-size:1.6rem;font-weight:900;color:#00b894;">
+                        {{ child_data.latest_assessment.comprehension_score|floatformat:0 }}%
+                    </div>
+                    <div class="text-muted small fw-bold">Comprehension</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div style="background:#fff3e0;border-radius:12px;padding:14px;">
+                    <div style="font-size:1.6rem;font-weight:900;color:#e17055;">
+                        {{ child_data.latest_assessment.working_memory_score|floatformat:0 }}%
+                    </div>
+                    <div class="text-muted small fw-bold">Working Memory</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div style="background:#fff0f7;border-radius:12px;padding:14px;">
+                    <div style="font-size:1.6rem;font-weight:900;color:#e84393;">
+                        {{ child_data.latest_assessment.reading_speed_wpm|floatformat:0 }}
+                    </div>
+                    <div class="text-muted small fw-bold">WPM</div>
+                </div>
+            </div>
+        </div>
+        {% if child_data.latest_assessment.recommendations %}
+        <div class="p-3" style="background:#f8f4ff;border-radius:12px;border-left:4px solid #6c63ff;">
+            <strong style="color:#6c63ff;">
+                <i class="fas fa-lightbulb me-2"></i>AI Recommendations:
+            </strong>
+            <p class="mb-0 mt-1 small">{{ child_data.latest_assessment.recommendations }}</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %} {% if child_data.plans %}
+<div class="card mb-4">
+    <div class="card-header fw-bold">
+        <i class="fas fa-book-open me-2" style="color:#6c63ff;"></i>Active Learning Plans
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th class="ps-3">Plan Title</th>
+                    <th>Modules</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for plan in child_data.plans %}
+            <tr>
+                <td class="ps-3 fw-bold">{{ plan.title }}</td>
+                <td>{{ plan.modules.count }} modules</td>
+                <td><span class="badge bg-success">Active</span></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+{% if child_data.reports %}
+<div class="card mb-4">
+    <div class="card-header fw-bold">
+        <i class="fas fa-file-alt me-2" style="color:#6c63ff;"></i>Recent Reports
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr><th class="ps-3">Report</th><th>Date</th><th></th></tr>
+            </thead>
+            <tbody>
+            {% for report in child_data.reports %}
+            <tr>
+                <td class="ps-3 fw-bold">{{ report.title|default:"Progress Report" }}</td>
+                <td class="text-muted small">{{ report.generated_at|date:"M d, Y" }}</td>
+                <td>
+                       <a href="#" class="btn btn-sm btn-outline-primary">View</a>
+                       class="btn btn-sm btn-outline-primary">View</a>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+{% elif pending_request %}
+
+<div class="card p-5 text-center">
+    <div style="width:80px;height:80px;background:linear-gradient(135deg,#fdcb6e,#e17055);
+                border-radius:50%;display:flex;align-items:center;justify-content:center;
+                margin:0 auto 20px;">
+        <i class="fas fa-clock fa-2x text-white"></i>
+    </div>
+    <h5 class="fw-bold mb-2">Request Pending Admin Approval</h5>
+    <p class="text-muted mb-1">
+        You submitted a request to access
+        <strong>{{ pending_request.student.get_full_name|default:pending_request.student.username }}</strong>'s data.
+    </p>
+    <p class="text-muted small mb-4">
+        Submitted on {{ pending_request.created_at|date:"M d, Y H:i" }}.
+        Please wait for the admin to review and approve your request.
+    </p>
+    <div class="d-flex gap-2 justify-content-center">
+        <span class="badge bg-warning text-dark px-4 py-2" style="font-size:0.9rem;">
+            <i class="fas fa-hourglass-half me-2"></i>Waiting for Approval
+        </span>
+        <a href="{% url 'accounts:cancel_request' pending_request.pk %}"
+           class="btn btn-outline-danger btn-sm"
+           onclick="return confirm('Cancel this request?')">
+            <i class="fas fa-times me-1"></i>Cancel Request
+        </a>
+    </div>
+</div>
+
+
+{% elif rejected_request %}
+
+<div class="card p-5 text-center">
+    <div style="width:80px;height:80px;background:linear-gradient(135deg,#d63031,#ff7675);
+                border-radius:50%;display:flex;align-items:center;justify-content:center;
+                margin:0 auto 20px;">
+        <i class="fas fa-times-circle fa-2x text-white"></i>
+    </div>
+    <h5 class="fw-bold mb-2">Request Rejected</h5>
+    <p class="text-muted mb-1">
+        Your request to access
+        <strong>{{ rejected_request.student.get_full_name|default:rejected_request.student.username }}</strong>
+        was rejected.
+    </p>
+    {% if rejected_request.admin_note %}
+    <div class="alert alert-light border mx-auto mb-4" style="max-width:400px;">
+        <strong>Admin note:</strong> {{ rejected_request.admin_note }}
+    </div>
+    {% endif %}
+    <a href="{% url 'accounts:request_child_link' %}" class="btn btn-primary px-5">
+        <i class="fas fa-redo me-2"></i>Submit a New Request
+    </a>
+</div>
+
+
+{% else %}
+
+<div class="card p-5 text-center">
+    <div style="width:80px;height:80px;background:linear-gradient(135deg,#6c63ff,#a29bfe);
+                border-radius:50%;display:flex;align-items:center;justify-content:center;
+                margin:0 auto 20px;">
+        <i class="fas fa-user-plus fa-2x text-white"></i>
+    </div>
+    <h5 class="fw-bold mb-2">No Child Linked Yet</h5>
+    <p class="text-muted mb-4">
+        To view your child's learning progress, assessments, and reports,
+        submit a request to link their student account.
+        An admin will approve your request before you gain access.
+    </p>
+    <a href="{% url 'accounts:request_child_link' %}"
+       class="btn btn-primary px-5 py-2 fw-bold">
+        <i class="fas fa-user-plus me-2"></i>Request to Link My Child
+    </a>
+</div>
+
+{% endif %}
+
+{% endblock %}

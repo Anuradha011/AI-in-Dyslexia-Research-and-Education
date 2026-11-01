@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Add Question{% endblock %}
+{% block page_title %}Add Assessment Question{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-lg-7">
+<div class="card"><div class="card-header"><i class="fas fa-plus me-2"></i>New Question</div>
+<div class="card-body p-4">
+    <form method="post">{% csrf_token %}
+        {% for field in form %}<div class="mb-3"><label class="form-label">{{ field.label }}</label>{{ field }}</div>{% endfor %}
+        <button type="submit" class="btn btn-primary">Save Question</button>
+        <a href="{% url 'assessment:questions' %}" class="btn btn-outline-secondary ms-2">Cancel</a>
+    </form>
+</div></div>
+</div></div>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}{{ plan.title }}{% endblock %}
+{% block page_title %}Learning Plan{% endblock %}
+{% block content %}
+<div class="card mb-4">
+    <div class="card-header"><i class="fas fa-book-open me-2" style="color:#6c63ff;"></i>{{ plan.title }}</div>
+    <div class="card-body"><p>{{ plan.description }}</p><p class="text-muted small mb-0">Student: <strong>{{ plan.student.username }}</strong> | Created: {{ plan.created_at|date:"M d, Y" }}</p></div>
+</div>
+<div class="row g-3">
+{% for mod in modules %}
+<div class="col-lg-6">
+    <div class="card {% if mod.is_completed %}border-success{% endif %}">
+        <div class="card-body">
+            <div class="d-flex align-items-center gap-3 mb-2">
+                <div style="width:40px;height:40px;background:{% if mod.is_completed %}linear-gradient(135deg,#00b894,#55efc4){% else %}linear-gradient(135deg,#6c63ff,#a29bfe){% endif %};border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <i class="fas {% if mod.module_type == 'phonics' %}fa-spell-check{% elif mod.module_type == 'reading' %}fa-book-reader{% elif mod.module_type == 'comprehension' %}fa-brain{% elif mod.module_type == 'spelling' %}fa-pen{% else %}fa-puzzle-piece{% endif %} text-white small"></i>
+                </div>
+                <div>
+                    <div class="fw-bold">{{ mod.title }}</div>
+                    <div class="d-flex gap-2 mt-1">
+                        <span class="badge bg-light text-dark border" style="font-size:0.7rem;">{{ mod.get_module_type_display }}</span>
+                        <span class="badge bg-light text-dark border" style="font-size:0.7rem;">{{ mod.get_difficulty_display }}</span>
+                    </div>
+                </div>
+                {% if mod.is_completed %}
+                <div class="ms-auto"><i class="fas fa-check-circle text-success fa-lg"></i></div>
+                {% endif %}
+            </div>
+            <p class="text-muted small mb-0">{{ mod.content|truncatechars:120 }}</p>
+        </div>
+    </div>
+</div>
+{% empty %}<div class="col-12"><p class="text-muted">No modules in this plan yet.</p></div>
+{% endfor %}
+</div>
+{% endblock %}

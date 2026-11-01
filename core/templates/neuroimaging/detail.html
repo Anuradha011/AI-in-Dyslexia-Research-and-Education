@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Scan Detail{% endblock %}
+{% block page_title %}Neuroimaging Analysis{% endblock %}
+{% block content %}
+<div class="row g-4">
+<div class="col-lg-8">
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between"><span><i class="fas fa-brain me-2" style="color:#6c63ff;"></i>{{ scan.get_scan_type_display }} Scan</span><span class="badge {% if scan.status == 'analyzed' %}bg-success{% else %}bg-secondary{% endif %}">{{ scan.get_status_display }}</span></div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4"><strong>Patient:</strong><br><span class="role-tag role-student mt-1 d-inline-block">{{ scan.patient.username }}</span></div>
+                <div class="col-md-4"><strong>Scan Type:</strong><br>{{ scan.get_scan_type_display }}</div>
+                <div class="col-md-4"><strong>Uploaded:</strong><br>{{ scan.uploaded_at|date:"M d, Y H:i" }}</div>
+                {% if scan.description %}<div class="col-12"><strong>Description:</strong><br>{{ scan.description }}</div>{% endif %}
+            </div>
+        </div>
+    </div>
+    {% if report %}
+    <div class="card">
+        <div class="card-header"><i class="fas fa-file-medical me-2 text-success"></i>Analysis Report (Confidence: {{ report.confidence_score|floatformat:0 }}%)</div>
+        <div class="card-body">
+            <div class="mb-3 p-3" style="background:#f0fdf4;border-radius:12px;border-left:4px solid #00b894;"><strong class="text-success">Neural Patterns:</strong><p class="mb-0 mt-1 small">{{ report.neural_patterns_detected }}</p></div>
+            <div class="mb-3 p-3" style="background:#fef9e7;border-radius:12px;border-left:4px solid #fdcb6e;"><strong style="color:#e17055;">Dyslexia Indicators:</strong><p class="mb-0 mt-1 small">{{ report.dyslexia_indicators }}</p></div>
+            <div class="p-3" style="background:#f8f4ff;border-radius:12px;border-left:4px solid #6c63ff;"><strong style="color:#6c63ff;"><i class="fas fa-user-md me-1"></i>Simplified Interpretation:</strong><p class="mb-0 mt-1">{{ report.simplified_interpretation }}</p></div>
+        </div>
+    </div>
+    {% else %}
+    <div class="card"><div class="card-body text-center py-4">
+        <i class="fas fa-hourglass-half fa-2x text-secondary mb-2 opacity-50"></i>
+        <p class="text-muted mb-3">No analysis report yet.</p>
+        {% if user.is_admin_user %}<a href="{% url 'neuroimaging:analyze' scan.pk %}" class="btn btn-primary"><i class="fas fa-robot me-2"></i>Run AI Analysis</a>{% endif %}
+    </div></div>
+    {% endif %}
+</div>
+<div class="col-lg-4">
+    <div class="card"><div class="card-body d-grid gap-2">
+        {% if scan.status != 'analyzed' and user.is_admin_user %}<a href="{% url 'neuroimaging:analyze' scan.pk %}" class="btn btn-primary">Run Analysis</a>{% endif %}
+        <a href="{% url 'neuroimaging:list' %}" class="btn btn-outline-secondary">← Back</a>
+    </div></div>
+</div>
+</div>
+{% endblock %}

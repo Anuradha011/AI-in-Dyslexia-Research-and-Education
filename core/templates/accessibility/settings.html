@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}Accessibility Settings{% endblock %}
+{% block page_title %}Accessibility & Display Settings{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-lg-7">
+<div class="card">
+    <div class="card-header"><i class="fas fa-universal-access me-2" style="color:#6c63ff;"></i>Accessibility Preferences</div>
+    <div class="card-body p-4">
+        <form method="post" action="{% url 'accessibility:save' %}">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label class="form-label">Font Size</label>
+                <div class="d-flex gap-2 flex-wrap">
+                    {% for val, label in prefs.FONT_SIZE_CHOICES %}
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="font_size" value="{{ val }}" id="fs_{{ val }}" {% if prefs.font_size == val %}checked{% endif %}>
+                        <label class="form-check-label" for="fs_{{ val }}">{{ label }}</label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="form-label">Reading Font</label>
+                <select name="font_family" class="form-select">
+                    {% for val, label in prefs.FONT_FAMILY_CHOICES %}
+                    <option value="{{ val }}" {% if prefs.font_family == val %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="form-label">Theme</label>
+                <select name="theme" class="form-select">
+                    {% for val, label in prefs.THEME_CHOICES %}
+                    <option value="{{ val }}" {% if prefs.theme == val %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="form-label">Preferred Language</label>
+                <select name="preferred_language" class="form-select">
+                    <option {% if prefs.preferred_language == 'English' %}selected{% endif %}>English</option>
+                    <option {% if prefs.preferred_language == 'Spanish' %}selected{% endif %}>Spanish</option>
+                    <option {% if prefs.preferred_language == 'French' %}selected{% endif %}>French</option>
+                    <option {% if prefs.preferred_language == 'Hindi' %}selected{% endif %}>Hindi</option>
+                    <option {% if prefs.preferred_language == 'Arabic' %}selected{% endif %}>Arabic</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="form-label d-block mb-2">Assistive Features</label>
+                <div class="form-check form-switch mb-2">
+                    <input class="form-check-input" type="checkbox" name="text_spacing" id="ts" {% if prefs.text_spacing %}checked{% endif %}>
+                    <label class="form-check-label" for="ts">Increased Text Spacing</label>
+                </div>
+                <div class="form-check form-switch mb-2">
+                    <input class="form-check-input" type="checkbox" name="reading_ruler" id="rr" {% if prefs.reading_ruler %}checked{% endif %}>
+                    <label class="form-check-label" for="rr">Reading Ruler / Line Guide</label>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" name="tts_enabled" id="tts" {% if prefs.tts_enabled %}checked{% endif %}>
+                    <label class="form-check-label" for="tts">Enable Text-to-Speech</label>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 py-2">Save Preferences</button>
+        </form>
+    </div>
+</div>
+</div></div>
+{% endblock %}

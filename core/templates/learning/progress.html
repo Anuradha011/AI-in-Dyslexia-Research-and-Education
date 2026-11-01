@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Progress{% endblock %}
+{% block page_title %}Learning Progress{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead><tr><th class="ps-3">Student</th><th>Module</th><th>Score</th><th>Time</th><th>Completed</th><th>Date</th></tr></thead>
+            <tbody>
+            {% for p in progress %}
+            <tr>
+                <td class="ps-3"><span class="role-tag role-student">{{ p.student.username }}</span></td>
+                <td class="fw-bold">{{ p.module.title }}</td>
+                <td><div class="d-flex align-items-center gap-2"><div class="progress flex-grow-1" style="height:8px;min-width:80px;"><div class="progress-bar" style="background:#6c63ff;width:{{ p.score }}%"></div></div><span class="small fw-bold">{{ p.score|floatformat:0 }}%</span></div></td>
+                <td class="text-muted small">{{ p.time_spent_minutes|floatformat:0 }} min</td>
+                <td>{% if p.completed %}<i class="fas fa-check-circle text-success"></i>{% else %}<i class="fas fa-clock text-warning"></i>{% endif %}</td>
+                <td class="text-muted small">{{ p.recorded_at|date:"M d, Y" }}</td>
+            </tr>
+            {% empty %}<tr><td colspan="6" class="text-center py-4 text-muted">No progress records yet.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

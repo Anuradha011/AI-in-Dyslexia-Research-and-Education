@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}NLP Configuration{% endblock %}
+{% block page_title %}Speech & NLP System Configuration{% endblock %}
+{% block content %}
+<div class="row g-4">
+<div class="col-lg-5">
+    <div class="card">
+        <div class="card-header"><i class="fas fa-plus me-2"></i>Add / Update Language Config</div>
+        <div class="card-body p-4">
+            <form method="post">{% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label">Language Code</label>
+                    <select name="language_code" class="form-select">
+                        <option value="en">en — English</option><option value="es">es — Spanish</option>
+                        <option value="fr">fr — French</option><option value="hi">hi — Hindi</option>
+                        <option value="ar">ar — Arabic</option><option value="de">de — German</option>
+                    </select>
+                </div>
+                <div class="mb-3"><label class="form-label">Language Name</label><input type="text" name="language_name" class="form-control" placeholder="e.g. English" required></div>
+                <div class="mb-3">
+                    <label class="form-label">TTS Speed (0.5 = slow, 1.0 = normal, 1.5 = fast)</label>
+                    <input type="number" name="tts_speed" class="form-control" min="0.5" max="2.0" step="0.1" value="1.0">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">STT Confidence Threshold</label>
+                    <input type="number" name="stt_confidence_threshold" class="form-control" min="0" max="1" step="0.05" value="0.7">
+                    <small class="text-muted">0.0 = accept all, 1.0 = only very high confidence</small>
+                </div>
+                <div class="mb-2 form-check form-switch"><input class="form-check-input" type="checkbox" name="is_enabled" id="en1" checked><label class="form-check-label" for="en1">Language Enabled</label></div>
+                <div class="mb-2 form-check form-switch"><input class="form-check-input" type="checkbox" name="fluency_scoring_enabled" id="en2" checked><label class="form-check-label" for="en2">Fluency Scoring</label></div>
+                <div class="mb-2 form-check form-switch"><input class="form-check-input" type="checkbox" name="grammar_check_enabled" id="en3" checked><label class="form-check-label" for="en3">Grammar Check</label></div>
+                <div class="mb-3 form-check form-switch"><input class="form-check-input" type="checkbox" name="pronunciation_scoring_enabled" id="en4" checked><label class="form-check-label" for="en4">Pronunciation Scoring</label></div>
+                <div class="mb-4"><label class="form-label">Notes</label><textarea name="notes" class="form-control" rows="2"></textarea></div>
+                <button type="submit" class="btn btn-primary w-100">Save Configuration</button>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="col-lg-7">
+    <div class="card">
+        <div class="card-header"><i class="fas fa-list me-2"></i>Configured Languages</div>
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead><tr><th class="ps-3">Language</th><th>TTS Speed</th><th>STT Conf.</th><th>Features</th><th>Status</th></tr></thead>
+                <tbody>
+                {% for c in configs %}
+                <tr>
+                    <td class="ps-3 fw-bold">{{ c.language_name }} <span class="text-muted font-monospace small">({{ c.language_code }})</span></td>
+                    <td>{{ c.tts_speed }}×</td>
+                    <td>{{ c.stt_confidence_threshold }}</td>
+                    <td>
+                        {% if c.fluency_scoring_enabled %}<span class="badge bg-success me-1" style="font-size:0.65rem;">Fluency</span>{% endif %}
+                        {% if c.grammar_check_enabled %}<span class="badge bg-info me-1" style="font-size:0.65rem;">Grammar</span>{% endif %}
+                        {% if c.pronunciation_scoring_enabled %}<span class="badge bg-purple me-1" style="font-size:0.65rem;background:#6c63ff;">Pronunc.</span>{% endif %}
+                    </td>
+                    <td>{% if c.is_enabled %}<span class="badge bg-success">Enabled</span>{% else %}<span class="badge bg-secondary">Disabled</span>{% endif %}</td>
+                </tr>
+                {% empty %}<tr><td colspan="5" class="text-center py-4 text-muted">No configurations yet.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

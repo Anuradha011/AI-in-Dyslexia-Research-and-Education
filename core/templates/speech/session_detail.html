@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+{% block title %}Session Detail{% endblock %}
+{% block page_title %}Speech Session Detail{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-lg-9">
+
+<!-- Header -->
+<div class="card mb-4" style="background:linear-gradient(135deg,#6c63ff,#fd79a8);border:none;">
+    <div class="card-body p-4 text-white">
+        <div class="row align-items-center">
+            <div class="col-md-7">
+                <div style="font-size:0.8rem;opacity:0.8;text-transform:uppercase;letter-spacing:2px;">Session Report</div>
+                <h4 class="fw-bold mt-1 mb-1">{{ session.get_session_type_display }}</h4>
+                <div style="opacity:0.85;">
+                    {{ session.student.get_full_name|default:session.student.username }}
+                    &nbsp;·&nbsp;
+                    {{ session.created_at|date:"F d, Y H:i" }}
+                </div>
+                <div class="mt-2 small opacity-75">
+                    <i class="fas fa-clock me-1"></i> {{ session.duration_seconds }}s
+                    &nbsp;·&nbsp;
+                    <i class="fas fa-font me-1"></i> {{ session.word_count }} words
+                    &nbsp;·&nbsp;
+                    <i class="fas fa-check me-1"></i> {{ session.words_correct }}/{{ session.words_total }} correct
+                </div>
+            </div>
+            <div class="col-md-5 text-md-end text-center mt-3 mt-md-0">
+                <div style="display:inline-block;background:rgba(255,255,255,0.2);border-radius:20px;padding:20px 36px;backdrop-filter:blur(10px);">
+                    <div style="font-size:3.5rem;font-weight:900;line-height:1;">{{ session.get_grade }}</div>
+                    <div style="font-size:0.9rem;font-weight:600;opacity:0.85;">Overall Grade</div>
+                    <div style="font-size:1.6rem;font-weight:800;margin-top:4px;">{{ session.overall_score }}%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Score Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="card text-center p-3 h-100">
+            <div style="width:48px;height:48px;background:linear-gradient(135deg,#6c63ff,#a29bfe);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
+                <i class="fas fa-water text-white"></i>
+            </div>
+            <div style="font-size:1.8rem;font-weight:900;color:#6c63ff;">{{ session.fluency_score|floatformat:0 }}%</div>
+            <div class="text-muted small fw-bold">Fluency</div>
+            <div class="progress mt-2" style="height:5px;">
+                <div class="progress-bar" style="background:#6c63ff;width:{{ session.fluency_score }}%;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center p-3 h-100">
+            <div style="width:48px;height:48px;background:linear-gradient(135deg,#00b894,#55efc4);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
+                <i class="fas fa-comment-dots text-white"></i>
+            </div>
+            <div style="font-size:1.8rem;font-weight:900;color:#00b894;">{{ session.pronunciation_score|floatformat:0 }}%</div>
+            <div class="text-muted small fw-bold">Pronunciation</div>
+            <div class="progress mt-2" style="height:5px;">
+                <div class="progress-bar bg-success" style="width:{{ session.pronunciation_score }}%;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center p-3 h-100">
+            <div style="width:48px;height:48px;background:linear-gradient(135deg,#fd79a8,#e84393);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
+                <i class="fas fa-bullseye text-white"></i>
+            </div>
+            <div style="font-size:1.8rem;font-weight:900;color:#e84393;">{{ session.accuracy_score|floatformat:0 }}%</div>
+            <div class="text-muted small fw-bold">Accuracy</div>
+            <div class="progress mt-2" style="height:5px;">
+                <div class="progress-bar" style="background:#e84393;width:{{ session.accuracy_score }}%;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center p-3 h-100">
+            <div style="width:48px;height:48px;background:linear-gradient(135deg,#e17055,#fdcb6e);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
+                <i class="fas fa-tachometer-alt text-white"></i>
+            </div>
+            <div style="font-size:1.8rem;font-weight:900;color:#e17055;">{{ session.reading_speed_wpm|floatformat:0 }}</div>
+            <div class="text-muted small fw-bold">WPM</div>
+            <div class="text-muted" style="font-size:0.7rem;">Ideal: 90–150</div>
+        </div>
+    </div>
+</div>
+
+<!-- Passage vs Transcript -->
+{% if session.passage_text or session.transcribed_text %}
+<div class="card mb-4">
+    <div class="card-header fw-bold">
+        <i class="fas fa-columns me-2" style="color:#6c63ff;"></i>Passage Comparison
+    </div>
+    <div class="card-body">
+        <div class="row g-4">
+            {% if session.passage_text %}
+            <div class="col-md-6">
+                <h6 class="fw-bold text-success mb-2">
+                    <i class="fas fa-book me-2"></i>Original Passage
+                </h6>
+                <div style="background:#f0fdf4;border-radius:12px;padding:16px;
+                            font-size:0.95rem;line-height:1.9;
+                            font-family:'Nunito',sans-serif;
+                            border:1px solid #d4edda;min-height:100px;">
+                    {{ session.passage_text }}
+                </div>
+            </div>
+            {% endif %}
+            {% if session.transcribed_text %}
+            <div class="col-md-6">
+                <h6 class="fw-bold mb-2" style="color:#6c63ff;">
+                    <i class="fas fa-microphone me-2"></i>What Was Said
+                </h6>
+                <div style="background:#f8f4ff;border-radius:12px;padding:16px;
+                            font-size:0.95rem;line-height:1.9;
+                            font-family:'Nunito',sans-serif;
+                            border:1px solid #d8d1ff;min-height:100px;">
+                    {{ session.transcribed_text }}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Word Stats -->
+<div class="card mb-4">
+    <div class="card-header fw-bold">
+        <i class="fas fa-spell-check me-2" style="color:#6c63ff;"></i>Word Statistics
+    </div>
+    <div class="card-body">
+        <div class="row g-3 text-center">
+            <div class="col-4">
+                <div style="background:#e0f7ef;border-radius:12px;padding:16px;">
+                    <div style="font-size:2rem;font-weight:900;color:#00b894;">{{ session.words_correct }}</div>
+                    <div class="text-muted small fw-bold">Words Correct</div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div style="background:#ede9ff;border-radius:12px;padding:16px;">
+                    <div style="font-size:2rem;font-weight:900;color:#6c63ff;">{{ session.words_total }}</div>
+                    <div class="text-muted small fw-bold">Total Words</div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div style="background:{% if session.words_total > 0 and session.words_correct == session.words_total %}#e0f7ef{% else %}#fce8e8{% endif %};border-radius:12px;padding:16px;">
+                    <div style="font-size:2rem;font-weight:900;color:{% if session.words_total > 0 and session.words_correct == session.words_total %}#00b894{% else %}#d63031{% endif %};">
+                        {% if session.words_total > 0 %}
+                            {% widthratio session.words_correct session.words_total 100 %}%
+                        {% else %}
+                            0%
+                        {% endif %}
+                    </div>
+                    <div class="text-muted small fw-bold">Match Rate</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AI Feedback Tips -->
+<div class="card mb-4">
+    <div class="card-header fw-bold">
+        <i class="fas fa-robot me-2" style="color:#6c63ff;"></i>AI Performance Feedback
+    </div>
+    <div class="card-body">
+        <div class="p-3" style="background:linear-gradient(135deg,#f8f4ff,#fff0f7);border-radius:14px;">
+
+            {% if session.fluency_score >= 85 %}
+            <div class="d-flex gap-2 mb-2 p-2" style="background:rgba(0,184,148,0.1);border-radius:8px;">
+                <i class="fas fa-check-circle text-success mt-1"></i>
+                <span class="small">Excellent fluency! You read smoothly and naturally.</span>
+            </div>
+            {% elif session.fluency_score >= 65 %}
+            <div class="d-flex gap-2 mb-2 p-2" style="background:rgba(253,203,110,0.15);border-radius:8px;">
+                <i class="fas fa-arrow-right text-warning mt-1"></i>
+                <span class="small">Good fluency. Practice reading the same passage multiple times to improve flow.</span>
+            </div>
+            {% else %}
+            <div class="d-flex gap-2 mb-2 p-2" style="background:rgba(214,48,49,0.08);border-radius:8px;">
+                <i class="fas fa-arrow-right text-danger mt-1"></i>
+                <span class="small">Focus on reading smoothly without long pauses. Try reading 10 minutes daily.</span>
+            </div>
+            {% endif %}
+
+            {% if session.pronunciation_score >= 85 %}
+            <div class="d-flex gap-2 mb-2 p-2" style="background:rgba(0,184,148,0.1);border-radius:8px;">
+                <i class="fas fa-check-circle text-success mt-1"></i>
+                <span class="small">Clear pronunciation throughout the session.</span>
+            </div>
+            {% elif session.pronunciation_score >= 65 %}
+            <div class="d-flex gap-2 mb-2 p-2" style="background:rgba(253,203,110,0.15);border-radius:8px;">
+                <i class="fas fa-arrow-right text-warning mt-1"></i>
+                <span class="small">Some words could be pronounced more clearly. Use the "Listen First" feature.</span>
+            </div>
+            {% else %}
+            <div class="d-flex gap-2 mb-2 p-2" style="background:rgba(214,48,49,0.08);border-radius:8px;">
+                <i class="fas fa-arrow-right text-danger mt-1"></i>
+                <span class="small">Work on pronunciation by breaking words into syllables and practicing each part.</span>
+            </div>
+            {% endif %}
+
+            {% if session.reading_speed_wpm >= 90 and session.reading_speed_wpm <= 200 %}
+            <div class="d-flex gap-2 mb-2 p-2" style="background:rgba(0,184,148,0.1);border-radius:8px;">
+                <i class="fas fa-check-circle text-success mt-1"></i>
+                <span class="small">Good reading speed at {{ session.reading_speed_wpm|floatformat:0 }} WPM.</span>
+            </div>
+            {% elif session.reading_speed_wpm < 60 and session.reading_speed_wpm > 0 %}
+            <div class="d-flex gap-2 mb-2 p-2" style="background:rgba(253,203,110,0.15);border-radius:8px;">
+                <i class="fas fa-arrow-right text-warning mt-1"></i>
+                <span class="small">Reading speed is {{ session.reading_speed_wpm|floatformat:0 }} WPM. Aim for 90+ WPM for fluent reading.</span>
+            </div>
+            {% elif session.reading_speed_wpm > 250 %}
+            <div class="d-flex gap-2 mb-2 p-2" style="background:rgba(253,203,110,0.15);border-radius:8px;">
+                <i class="fas fa-arrow-right text-warning mt-1"></i>
+                <span class="small">Reading a bit fast at {{ session.reading_speed_wpm|floatformat:0 }} WPM. Slow down slightly for better clarity.</span>
+            </div>
+            {% endif %}
+
+            <div class="d-flex gap-2 p-2" style="background:rgba(108,99,255,0.08);border-radius:8px;">
+                <i class="fas fa-lightbulb mt-1" style="color:#6c63ff;"></i>
+                <span class="small"><strong>Tip:</strong> Practice daily for 10 minutes. Consistent reading practice builds fluency, accuracy, and confidence over time.</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Action Buttons -->
+<div class="d-flex gap-3 flex-wrap justify-content-center mb-5">
+    <a href="{% url 'speech:session' %}" class="btn btn-primary px-5 py-2 fw-bold">
+        <i class="fas fa-redo me-2"></i>New Session
+    </a>
+    <a href="{% url 'speech:sessions' %}" class="btn btn-outline-primary px-4 py-2">
+        <i class="fas fa-history me-2"></i>All Sessions
+    </a>
+    <a href="{% url 'speech:home' %}" class="btn btn-outline-secondary px-4 py-2">
+        <i class="fas fa-home me-2"></i>Speech Home
+    </a>
+</div>
+
+</div>
+</div>
+{% endblock %}

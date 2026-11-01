@@ -1,0 +1,384 @@
+{% extends 'base.html' %}
+{% block title %}Speech Practice Session{% endblock %}
+{% block page_title %}Speech Practice Session{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-lg-9">
+
+{% if messages %}
+{% for msg in messages %}
+<div class="alert alert-danger alert-dismissible fade show">
+    {{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{% endfor %}
+{% endif %}
+
+<!-- Passage Card -->
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-book-open me-2" style="color:#6c63ff;"></i><strong>Read This Passage Aloud</strong></span>
+        <div class="d-flex gap-2 align-items-center">
+            <button onclick="speakPassage()" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-volume-up me-1"></i>Listen First
+            </button>
+            <span class="badge bg-light text-dark border" id="word-count-badge">0 words spoken</span>
+        </div>
+    </div>
+    <div class="card-body p-4">
+        <div id="passage-display"
+             style="font-size:1.2rem;line-height:2.2;letter-spacing:0.04em;font-family:'Nunito',sans-serif;color:#2d3436;">
+            {{ session.passage_text }}
+        </div>
+    </div>
+</div>
+
+<!-- Recording Card -->
+<div class="card mb-4">
+    <div class="card-body p-4">
+
+        <!-- Mic Button + Status -->
+        <div class="text-center mb-4">
+            <div id="mic-btn"
+                 onclick="toggleRecording()"
+                 style="width:110px;height:110px;
+                        background:linear-gradient(135deg,#6c63ff,#a29bfe);
+                        border-radius:50%;
+                        display:flex;align-items:center;justify-content:center;
+                        margin:0 auto 20px;cursor:pointer;
+                        box-shadow:0 8px 32px rgba(108,99,255,0.3);
+                        transition:all 0.3s;">
+                <i id="mic-icon" class="fas fa-microphone" style="font-size:2.8rem;color:#fff;"></i>
+            </div>
+            <div id="status-text"
+                 style="font-size:1rem;font-weight:700;color:#6c63ff;">
+                🎤 Click the microphone to start speaking
+            </div>
+            <div id="timer-display"
+                 style="font-size:2.2rem;font-weight:900;color:#2d3436;
+                        margin-top:8px;display:none;font-family:monospace;">
+                00:00
+            </div>
+        </div>
+
+        <!-- Live Transcript Box -->
+        <div class="mb-4">
+            <label class="form-label fw-bold">
+                <i class="fas fa-align-left me-2" style="color:#6c63ff;"></i>Live Transcript
+            </label>
+            <div id="transcript-box"
+                 style="min-height:130px;
+                        background:#f8f4ff;
+                        border:2px dashed #a29bfe;
+                        border-radius:14px;padding:18px;
+                        font-size:1rem;line-height:1.9;
+                        color:#2d3436;
+                        font-family:'Nunito',sans-serif;
+                        transition:border-color 0.3s;">
+                <span id="transcript-placeholder" class="text-muted">
+                    Your spoken words will appear here in real time as you speak...
+                </span>
+                <span id="final-text" style="color:#2d3436;"></span>
+                <span id="interim-text" style="color:#a29bfe;font-style:italic;"></span>
+            </div>
+        </div>
+
+        <!-- Control Buttons -->
+        <div class="d-flex gap-3 justify-content-center flex-wrap mb-3">
+            <button id="start-btn" onclick="startRecording()"
+                    class="btn btn-success px-5 py-2 fw-bold">
+                <i class="fas fa-microphone me-2"></i>Start Recording
+            </button>
+            <button id="stop-btn" onclick="stopRecording()"
+                    class="btn btn-danger px-5 py-2 fw-bold" disabled>
+                <i class="fas fa-stop-circle me-2"></i>Stop Recording
+            </button>
+            <button onclick="clearAll()"
+                    class="btn btn-outline-secondary px-4 py-2">
+                <i class="fas fa-redo me-2"></i>Reset
+            </button>
+        </div>
+
+        <!-- Browser Warning -->
+        <div id="browser-warning" class="alert alert-warning d-none">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            Your browser doesn't support speech recognition.
+            Please use <strong>Google Chrome</strong> or <strong>Microsoft Edge</strong>.
+        </div>
+
+        <!-- Permission Warning -->
+        <div id="permission-warning" class="alert alert-danger d-none">
+            <i class="fas fa-microphone-slash me-2"></i>
+            Microphone access was denied. Please click the lock icon in your browser's
+            address bar and allow microphone access, then refresh the page.
+        </div>
+
+    </div>
+</div>
+
+<!-- Hidden Form -->
+<form id="analysis-form" method="post" action="{% url 'speech:analyze' %}">
+    {% csrf_token %}
+    <input type="hidden" id="h-transcript"  name="transcribed_text" value="">
+    <input type="hidden" id="h-duration"    name="duration_seconds" value="0">
+    <input type="hidden" id="h-wordcount"   name="word_count"       value="0">
+    <input type="hidden" id="h-passage"     name="passage_text"     value="{{ session.passage_text }}">
+    <input type="hidden"                    name="session_id"        value="{{ session.pk }}">
+</form>
+
+<!-- Analyze Button -->
+<div class="text-center mb-5">
+    <button id="analyze-btn"
+            onclick="submitAnalysis()"
+            disabled
+            style="background:linear-gradient(135deg,#6c63ff,#fd79a8);
+                   border:none;border-radius:18px;
+                   padding:16px 48px;
+                   font-size:1.1rem;font-weight:800;
+                   color:#fff;cursor:pointer;
+                   box-shadow:0 8px 32px rgba(108,99,255,0.3);
+                   opacity:0.5;transition:all 0.3s;">
+        <i class="fas fa-chart-bar me-2"></i>Analyze My Speech & Get Full Report
+    </button>
+    <p class="text-muted small mt-3">
+        Record your speech first, then click above to receive your detailed performance report.
+    </p>
+</div>
+
+</div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// ── STATE ─────────────────────────────────────────────────────────────
+let recognition   = null;
+let isRecording   = false;
+let startTime     = null;
+let timerInterval = null;
+let finalText     = '';
+let wordCount     = 0;
+let totalSeconds  = 0;
+
+const passageText = document.getElementById('passage-display').innerText.trim();
+
+// ── BOOT ─────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) {
+        document.getElementById('browser-warning').classList.remove('d-none');
+        document.getElementById('start-btn').disabled = true;
+        document.getElementById('mic-btn').style.opacity = '0.4';
+        document.getElementById('mic-btn').style.cursor  = 'not-allowed';
+    } else {
+        initRecognition(SR);
+    }
+});
+
+// ── INIT RECOGNITION ─────────────────────────────────────────────────
+function initRecognition(SR) {
+    recognition = new SR();
+    recognition.continuous     = true;
+    recognition.interimResults = true;
+    recognition.lang           = 'en-US';
+
+    recognition.onstart = () => {
+        isRecording = true;
+        setUI('recording');
+        startTimer();
+    };
+
+    recognition.onresult = (event) => {
+        let interim = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            const t = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+                finalText += t + ' ';
+                document.getElementById('final-text').innerText = finalText;
+            } else {
+                interim += t;
+            }
+        }
+        document.getElementById('interim-text').innerText = interim;
+        document.getElementById('transcript-placeholder').style.display = 'none';
+
+        wordCount = finalText.trim().split(/\s+/).filter(w => w.length > 0).length;
+        document.getElementById('word-count-badge').innerText = wordCount + ' words spoken';
+
+        if (finalText.trim().length > 3) {
+            enableAnalyzeBtn();
+        }
+    };
+
+    recognition.onerror = (event) => {
+        console.error('Speech error:', event.error);
+        if (event.error === 'not-allowed') {
+            document.getElementById('permission-warning').classList.remove('d-none');
+            stopRecording();
+        } else if (event.error === 'no-speech') {
+            setStatus('🔇 No speech detected — speak louder or move closer to mic', '#e17055');
+        } else if (event.error === 'network') {
+            setStatus('⚠️ Network error — check your internet connection', '#d63031');
+        }
+    };
+
+    recognition.onend = () => {
+        // Auto-restart if still supposed to be recording
+        if (isRecording) {
+            try { recognition.start(); } catch(e) { /* already started */ }
+        }
+    };
+}
+
+// ── RECORDING ────────────────────────────────────────────────────────
+function startRecording() {
+    if (!recognition) return;
+    finalText = '';
+    document.getElementById('final-text').innerText    = '';
+    document.getElementById('interim-text').innerText  = '';
+    document.getElementById('transcript-placeholder').style.display = 'inline';
+    try {
+        recognition.start();
+    } catch(e) {
+        console.log('Recognition start error:', e);
+    }
+}
+
+function stopRecording() {
+    isRecording = false;
+    if (recognition) recognition.stop();
+    stopTimer();
+    setUI('idle');
+
+    totalSeconds = startTime ? Math.floor((Date.now() - startTime) / 1000) : 0;
+    document.getElementById('h-transcript').value = finalText.trim();
+    document.getElementById('h-duration').value   = totalSeconds;
+    document.getElementById('h-wordcount').value  = wordCount;
+
+    if (finalText.trim().length > 3) {
+        enableAnalyzeBtn();
+        setStatus('✅ Recording complete! Click "Analyze My Speech" to get your report.', '#00b894');
+    } else {
+        setStatus('⚠️ Very little speech detected. Please try again.', '#e17055');
+    }
+}
+
+function toggleRecording() {
+    if (isRecording) stopRecording();
+    else startRecording();
+}
+
+function clearAll() {
+    if (isRecording) stopRecording();
+    finalText = '';
+    wordCount = 0;
+    document.getElementById('final-text').innerText    = '';
+    document.getElementById('interim-text').innerText  = '';
+    document.getElementById('transcript-placeholder').style.display = 'inline';
+    document.getElementById('word-count-badge').innerText  = '0 words spoken';
+    document.getElementById('timer-display').style.display = 'none';
+    disableAnalyzeBtn();
+    setStatus('🎤 Click the microphone to start speaking', '#6c63ff');
+}
+
+// ── TIMER ────────────────────────────────────────────────────────────
+function startTimer() {
+    startTime = Date.now();
+    document.getElementById('timer-display').style.display = 'block';
+    timerInterval = setInterval(() => {
+        const s = Math.floor((Date.now() - startTime) / 1000);
+        const mm = String(Math.floor(s / 60)).padStart(2, '0');
+        const ss = String(s % 60).padStart(2, '0');
+        document.getElementById('timer-display').innerText = mm + ':' + ss;
+    }, 500);
+}
+
+function stopTimer() {
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+}
+
+// ── UI HELPERS ───────────────────────────────────────────────────────
+function setUI(state) {
+    const btn  = document.getElementById('mic-btn');
+    const icon = document.getElementById('mic-icon');
+    const sBtn = document.getElementById('start-btn');
+    const xBtn = document.getElementById('stop-btn');
+
+    if (state === 'recording') {
+        btn.style.background  = 'linear-gradient(135deg,#d63031,#ff7675)';
+        btn.style.animation   = 'pulse 1.2s infinite';
+        btn.style.boxShadow   = '0 8px 32px rgba(214,48,49,0.4)';
+        icon.className        = 'fas fa-stop';
+        sBtn.disabled         = true;
+        xBtn.disabled         = false;
+        setStatus('🔴 Recording... Speak clearly and read the passage aloud', '#d63031');
+    } else {
+        btn.style.background  = 'linear-gradient(135deg,#6c63ff,#a29bfe)';
+        btn.style.animation   = '';
+        btn.style.boxShadow   = '0 8px 32px rgba(108,99,255,0.3)';
+        icon.className        = 'fas fa-microphone';
+        sBtn.disabled         = false;
+        xBtn.disabled         = true;
+    }
+}
+
+function setStatus(msg, color) {
+    const el = document.getElementById('status-text');
+    el.innerText    = msg;
+    el.style.color  = color || '#6c63ff';
+}
+
+function enableAnalyzeBtn() {
+    const btn = document.getElementById('analyze-btn');
+    btn.disabled    = false;
+    btn.style.opacity = '1';
+    btn.style.cursor  = 'pointer';
+}
+
+function disableAnalyzeBtn() {
+    const btn = document.getElementById('analyze-btn');
+    btn.disabled      = true;
+    btn.style.opacity = '0.5';
+    btn.style.cursor  = 'not-allowed';
+}
+
+// ── SUBMIT ───────────────────────────────────────────────────────────
+function submitAnalysis() {
+    if (!finalText.trim()) {
+        alert('Please record your speech first before analyzing.');
+        return;
+    }
+    document.getElementById('h-transcript').value = finalText.trim();
+    document.getElementById('h-duration').value   = totalSeconds || 1;
+    document.getElementById('h-wordcount').value  = wordCount;
+
+    const btn = document.getElementById('analyze-btn');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Analyzing your speech...';
+    btn.disabled  = true;
+    btn.style.opacity = '0.8';
+
+    document.getElementById('analysis-form').submit();
+}
+
+// ── LISTEN FIRST (TTS) ───────────────────────────────────────────────
+function speakPassage() {
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const u  = new SpeechSynthesisUtterance(passageText);
+    u.rate   = 0.85;
+    u.pitch  = 1.0;
+    u.lang   = 'en-US';
+    window.speechSynthesis.speak(u);
+}
+
+// ── PULSE ANIMATION ──────────────────────────────────────────────────
+const s = document.createElement('style');
+s.textContent = `
+@keyframes pulse {
+    0%   { transform:scale(1);    box-shadow:0 0 0 0   rgba(214,48,49,0.5); }
+    70%  { transform:scale(1.06); box-shadow:0 0 0 18px rgba(214,48,49,0);   }
+    100% { transform:scale(1);    box-shadow:0 0 0 0   rgba(214,48,49,0);   }
+}`;
+document.head.appendChild(s);
+</script>
+{% endblock %}

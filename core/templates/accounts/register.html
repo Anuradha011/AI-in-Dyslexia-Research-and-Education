@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block auth_content %}
+<div style="min-height:100vh;background:linear-gradient(135deg,#6c63ff,#fd79a8);display:flex;align-items:center;justify-content:center;padding:40px 20px;">
+    <div style="width:100%;max-width:560px;">
+        <div class="text-center mb-4">
+            <div style="width:64px;height:64px;background:rgba(255,255,255,0.25);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;backdrop-filter:blur(10px);">
+                <i class="fas fa-brain fa-2x text-white"></i>
+            </div>
+            <h3 style="color:#fff;font-weight:800;">Create Your Account</h3>
+            <p style="color:rgba(255,255,255,0.75);">Join the DyslexiaCare learning community</p>
+        </div>
+        <div class="card p-4">
+
+            {% if messages %}
+            {% for msg in messages %}
+            <div class="alert alert-{% if 'created' in msg.message %}success{% else %}danger{% endif %} py-2">
+                {{ msg }}
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="row g-3">
+                    <div class="col-6">
+                        <label class="form-label">First Name</label>
+                        <input type="text" name="first_name" class="form-control" placeholder="First name">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Last Name</label>
+                        <input type="text" name="last_name" class="form-control" placeholder="Last name">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Username <span class="text-danger">*</span></label>
+                        <input type="text" name="username" class="form-control" required placeholder="Choose a username">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Email <span class="text-danger">*</span></label>
+                        <input type="email" name="email" class="form-control" required placeholder="your@email.com">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">I am a <span class="text-danger">*</span></label>
+                        <select name="role" class="form-select">
+                            <option value="student">Student</option>
+                            <option value="educator">Educator</option>
+                            <option value="parent">Parent</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Date of Birth</label>
+                        <input type="date" name="date_of_birth" class="form-control">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Institution / School</label>
+                        <input type="text" name="institution" class="form-control" placeholder="School or organization name">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Password <span class="text-danger">*</span></label>
+                        <input type="password" name="password1" class="form-control" required placeholder="Min 8 characters">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                        <input type="password" name="password2" class="form-control" required placeholder="Repeat password">
+                    </div>
+                </div>
+
+                <div class="alert alert-light border mt-3 small">
+                    <i class="fas fa-info-circle text-primary me-1"></i>
+                    Password must be at least 8 characters and cannot be entirely numeric.
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 py-2 mt-2 fw-bold">
+                    <i class="fas fa-user-plus me-2"></i>Create Account
+                </button>
+            </form>
+
+            <div class="text-center mt-3">
+                <span class="text-muted small">Already have an account? </span>
+                <a href="{% url 'accounts:login' %}" class="small fw-bold text-decoration-none" style="color:#6c63ff;">Sign in</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

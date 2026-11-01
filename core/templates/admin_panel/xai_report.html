@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% block title %}AI Explanation{% endblock %}
+{% block page_title %}Explainable AI — Risk Assessment Breakdown{% endblock %}
+{% block content %}
+
+<div class="row justify-content-center">
+<div class="col-lg-9">
+
+    <!-- Header -->
+    <div class="card mb-4" style="background:linear-gradient(135deg,#6c63ff,#a29bfe);border:none;">
+        <div class="card-body p-4 text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="fw-bold mb-1">{{ assessment.title }}</h5>
+                    <p class="mb-0 opacity-75">Student: {{ assessment.student.get_full_name|default:assessment.student.username }} · {{ assessment.completed_at|date:"M d, Y" }}</p>
+                </div>
+                <div class="text-center">
+                    <div style="font-size:2.5rem;font-weight:800;">{{ assessment.risk_score|floatformat:1 }}</div>
+                    <span class="badge risk-{{ assessment.risk_level }} px-3 py-2 fs-6">{{ assessment.get_risk_level_display }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- XAI Explanation Banner -->
+    <div class="alert alert-light border mb-4">
+        <i class="fas fa-robot me-2" style="color:#6c63ff;"></i>
+        <strong>How was this risk score calculated?</strong> The AI analyzed <strong>{{ factors|length }} key factors</strong> from the assessment. Each factor has a different weight reflecting its importance in identifying dyslexia. The breakdown below shows exactly how each factor contributed to the final risk score of <strong>{{ assessment.risk_score|floatformat:1 }} / 100</strong>.
+    </div>
+
+    <!-- Factor Breakdown -->
+    <div class="row g-4 mb-4">
+        {% for factor in factors %}
+        <div class="col-md-6">
+            <div class="card h-100" style="border-left:4px solid {% if factor.status == 'high' %}#d63031{% elif factor.status == 'moderate' %}#fdcb6e{% else %}#00b894{% endif %};">
+                <div class="card-body">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div style="width:44px;height:44px;background:{% if factor.status == 'high' %}linear-gradient(135deg,#d63031,#ff7675){% elif factor.status == 'moderate' %}linear-gradient(135deg,#e17055,#fdcb6e){% else %}linear-gradient(135deg,#00b894,#55efc4){% endif %};border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="fas {{ factor.icon }} text-white"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold">{{ factor.name }}</div>
+                            <div class="text-muted small">Weight: {{ factor.weight|floatformat:0 }}% of total score</div>
+                        </div>
+                        <div class="ms-auto text-end">
+                            <div style="font-size:1.4rem;font-weight:800;color:{% if factor.status == 'high' %}#d63031{% elif factor.status == 'moderate' %}#e17055{% else %}#00b894{% endif %};">{{ factor.score|floatformat:0 }}%</div>
+                            <div class="text-muted small">Score</div>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span class="text-muted">Performance</span>
+                            <span class="fw-bold">{{ factor.score|floatformat:0 }}%</span>
+                        </div>
+                        <div class="progress" style="height:8px;">
+                            <div class="progress-bar {% if factor.status == 'high' %}bg-danger{% elif factor.status == 'moderate' %}bg-warning{% else %}bg-success{% endif %}" style="width:{{ factor.score }}%"></div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <span class="text-muted small">{{ factor.description }}</span>
+                        <span class="badge risk-{{ factor.status }} ms-2">+{{ factor.contribution }} pts</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Final Score Breakdown -->
+    <div class="card mb-4">
+        <div class="card-header fw-bold"><i class="fas fa-calculator me-2" style="color:#6c63ff;"></i>Risk Score Calculation Summary</div>
+        <div class="card-body">
+            <table class="table table-sm mb-3">
+                <thead><tr><th>Factor</th><th>Score</th><th>Weight</th><th>Contribution to Risk</th></tr></thead>
+                <tbody>
+                {% for f in factors %}
+                <tr>
+                    <td><i class="fas {{ f.icon }} me-2" style="color:#6c63ff;"></i>{{ f.name }}</td>
+                    <td>{{ f.score|floatformat:0 }}%</td>
+                    <td>{{ f.weight|floatformat:0 }}%</td>
+                    <td><strong>{{ f.contribution }} points</strong></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr style="background:#f8f4ff;">
+                        <td colspan="3"><strong>Total Risk Score</strong></td>
+                        <td><strong style="color:#6c63ff;font-size:1.1rem;">{{ total_contribution }} / 100</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+            <div class="p-3" style="background:#f8f4ff;border-radius:12px;border-left:4px solid #6c63ff;">
+                <strong style="color:#6c63ff;"><i class="fas fa-lightbulb me-2"></i>AI Interpretation:</strong>
+                <p class="mb-0 mt-1 small">{{ assessment.ai_analysis }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recommendations -->
+    <div class="card mb-4">
+        <div class="card-header fw-bold"><i class="fas fa-tasks me-2 text-success"></i>Personalized Recommendations</div>
+        <div class="card-body">
+            <div class="p-3" style="background:#e0f7ef;border-radius:12px;">
+                <p class="mb-0">{{ assessment.recommendations }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2">
+        <a href="{% url 'assessment:results' assessment.pk %}" class="btn btn-outline-secondary">← Back to Results</a>
+        <a href="{% url 'learning:home' %}" class="btn btn-primary">Go to Learning Plans</a>
+        <a href="{% url 'reports:generate' assessment.student.pk %}" class="btn btn-outline-success">Generate Full Report</a>
+    </div>
+
+</div>
+</div>
+{% endblock %}
